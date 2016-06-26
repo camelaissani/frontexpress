@@ -6,8 +6,8 @@
   "scripts": {
     "build": "webpack",
     "dev": "webpack-dev-server index.js --watch",
-    "test": "mocha --compilers js:babel-core/register",
-    "cover": "babel-node node_modules/.bin/babel-istanbul cover node_modules/.bin/_mocha"
+    "only-test": "mocha --compilers js:babel-core/register",
+    "test": "babel-node node_modules/.bin/babel-istanbul cover node_modules/.bin/_mocha"
   },
   "author": "Camel Aissani <camel.aissani@gmail.com> (https://nuageprive.fr)",
   "license": "MIT",
