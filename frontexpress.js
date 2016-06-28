@@ -1,6 +1,6 @@
-import Application from './application';
-import Router from './router';
-import Middleware from './middleware';
+import Application from './lib/application';
+import Router from './lib/router';
+import Middleware from './lib/middleware';
 
 function frontexpress() {
     return new Application();

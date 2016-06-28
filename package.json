@@ -2,10 +2,8 @@
   "name": "frontexpress",
   "version": "1.0.0",
   "description": "Minimalist front end router framework a la express",
-  "main": "dist/frontexpress.js",
+  "main": "frontexpress.js",
   "scripts": {
-    "build": "webpack",
-    "dev": "webpack-dev-server index.js --watch",
     "only-test": "mocha --compilers js:babel-core/register",
     "test": "babel-node node_modules/.bin/babel-istanbul cover node_modules/.bin/_mocha"
   },
@@ -26,13 +24,11 @@
     "frontexpress"
   ],
   "devDependencies": {
-    "babel-cli": "^6.9.0",
-    "babel-core": "^6.9.0",
-    "babel-eslint": "^6.0.4",
+    "babel-cli": "^6.10.1",
+    "babel-core": "^6.10.4",
+    "babel-eslint": "^6.1.0",
     "babel-istanbul": "^0.8.0",
-    "babel-loader": "^6.2.4",
     "babel-preset-es2015": "^6.9.0",
-    "babel-register": "^6.9.0",
     "chai": "^3.5.0",
     "eslint": "^2.11.0",
     "eslint-loader": "^1.3.0",
@@ -42,8 +38,6 @@
     "mocha": "^2.5.3",
     "mocha-jsdom": "^1.1.0",
     "rewire": "^2.5.1",
-    "sinon": "^1.17.4",
-    "webpack": "^1.13.1",
-    "webpack-dev-server": "^1.14.1"
+    "sinon": "^1.17.4"
   }
 }

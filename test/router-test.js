@@ -1,7 +1,7 @@
 /*eslint-env mocha*/
 import {assert} from 'chai';
 import sinon from 'sinon';
-import frontexpress from '../lib/frontexpress';
+import frontexpress from '../frontexpress';
 import {HTTP_METHODS} from '../lib/requester';
 
 describe('Router', () => {
