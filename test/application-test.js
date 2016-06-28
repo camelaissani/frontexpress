@@ -105,6 +105,28 @@ describe('Application', () => {
             });
         });
 
+        it('middleware as function on path / request fails', (done) => {
+            requester = new Requester();
+            sinon.stub(requester, 'fetch', ({uri, method, headers, data}, resolve, reject) => {
+                reject(
+                    {uri, method, headers, data},
+                    {status: 401, statusText: 'not logged'}
+                );
+            });
+
+            const spy = sinon.spy();
+
+            const app = frontexpress();
+            app.set('http-requester', requester);
+            app.use((request, response) => {spy()});
+
+            app.httpGet('/', null, (request, response) => {
+                assert(spy.callCount === 1);
+                assert(response.status === 401);
+                done();
+            });
+        });
+
         it('middleware as object on path /', (done) => {
             const middleware = new frontexpress.Middleware('on path /');
             const spy = sinon.spy(middleware, 'updated');
@@ -138,6 +160,29 @@ describe('Application', () => {
                     assert(spy.callCount === 2);
                     done();
                 });
+            });
+        });
+
+        it('middleware as object on path / request fails', (done) => {
+            requester = new Requester();
+            sinon.stub(requester, 'fetch', ({uri, method, headers, data}, resolve, reject) => {
+                reject(
+                    {uri, method, headers, data},
+                    {status: 401, statusText: 'not logged'}
+                );
+            });
+
+            const middleware = new frontexpress.Middleware('on path /');
+            const spy = sinon.spy(middleware, 'failed');
+
+            const app = frontexpress();
+            app.set('http-requester', requester);
+            app.use(middleware);
+
+            app.httpGet('/', null, (request, response) => {
+                assert(spy.callCount === 1);
+                assert(response.status === 401);
+                done();
             });
         });
 
