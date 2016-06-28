@@ -1,6 +1,6 @@
 {
   "name": "frontexpress",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Minimalist front end router framework a la express",
   "main": "dist/frontexpress.js",
   "scripts": {
