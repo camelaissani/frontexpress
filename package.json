@@ -2,13 +2,18 @@
   "name": "frontexpress",
   "version": "1.0.0",
   "description": "Minimalist front end router framework a la express",
-  "main": "frontexpress.js",
+  "main": "dits/frontexpress.js",
   "scripts": {
+    "lint": "eslint .",
     "only-test": "mocha --compilers js:babel-core/register",
-    "test": "babel-node node_modules/.bin/babel-istanbul cover node_modules/.bin/_mocha"
+    "test": "npm run lint && babel-node node_modules/.bin/babel-istanbul cover node_modules/.bin/_mocha",
+    "prepublish": "rimraf dist && babel lib -d dist"
   },
   "author": "Camel Aissani <camel.aissani@gmail.com> (https://nuageprive.fr)",
   "license": "MIT",
+  "engines": {
+    "node": ">=0.10.0"
+  },
   "repository": "camelaissani/frontexpress",
   "keywords": [
     "front",
@@ -38,6 +43,7 @@
     "mocha": "^2.5.3",
     "mocha-jsdom": "^1.1.0",
     "rewire": "^2.5.1",
+    "rimraf": "^2.5.2",
     "sinon": "^1.17.4"
   }
 }
