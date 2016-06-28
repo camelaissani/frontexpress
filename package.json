@@ -2,7 +2,7 @@
   "name": "frontexpress",
   "version": "1.0.0",
   "description": "Minimalist front end router framework a la express",
-  "main": "dits/frontexpress.js",
+  "main": "dist/frontexpress.js",
   "scripts": {
     "lint": "eslint .",
     "only-test": "mocha --compilers js:babel-core/register",
