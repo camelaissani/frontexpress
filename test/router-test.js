@@ -16,14 +16,26 @@ describe('Router', () => {
         });
     });
 
-    describe('getRoutes method', () => {
+    describe('visited method', () => {
+        it('get visited route', ()=> {
+            const router = new frontexpress.Router();
+            const middleware = (request, response) => {};
+
+            router.get(middleware);
+
+            const r1 = router.visited();
+            assert(r1.length === 0);
+        });
+    });
+
+    describe('routes method', () => {
         it('no root path and no path uri', ()=> {
             const router = new frontexpress.Router();
             const middleware = (request, response) => {};
 
             router.get(middleware);
 
-            const r1 = router.getRoutes('/', 'GET');
+            const r1 = router.routes('/', 'GET');
             assert(r1.length === 1);
             assert(r1[0].uri === undefined);
             assert(r1[0].method === 'GET');
@@ -41,37 +53,37 @@ describe('Router', () => {
                 .post('/route2', middleware2)
                 .all('/route3', middleware3);
 
-            const r1 = router.getRoutes('/route1', 'GET');
+            const r1 = router.routes('/route1', 'GET');
             assert(r1.length === 1);
             assert(r1[0].uri === '/route1');
             assert(r1[0].method === 'GET');
             assert(r1[0].middleware === middleware1);
 
-            const r2 = router.getRoutes('/route2', 'POST');
+            const r2 = router.routes('/route2', 'POST');
             assert(r2.length === 1);
             assert(r2[0].uri === '/route2');
             assert(r2[0].method === 'POST');
             assert(r2[0].middleware === middleware2);
 
-            let r3 = router.getRoutes('/route3', 'GET');
+            let r3 = router.routes('/route3', 'GET');
             assert(r3.length === 1);
             assert(r3[0].uri === '/route3');
             assert(r3[0].method === 'GET');
             assert(r3[0].middleware === middleware3);
 
-            r3 = router.getRoutes('/route3', 'POST');
+            r3 = router.routes('/route3', 'POST');
             assert(r3.length === 1);
             assert(r3[0].uri === '/route3');
             assert(r3[0].method === 'POST');
             assert(r3[0].middleware === middleware3);
 
-            r3 = router.getRoutes('/route3', 'PUT');
+            r3 = router.routes('/route3', 'PUT');
             assert(r3.length === 1);
             assert(r3[0].uri === '/route3');
             assert(r3[0].method === 'PUT');
             assert(r3[0].middleware === middleware3);
 
-            r3 = router.getRoutes('/route3', 'DELETE');
+            r3 = router.routes('/route3', 'DELETE');
             assert(r3.length === 1);
             assert(r3[0].uri === '/route3');
             assert(r3[0].method === 'DELETE');
@@ -84,7 +96,7 @@ describe('Router', () => {
 
             router.get(/^\/route1/, middleware);
 
-            const r = router.getRoutes('/route1', 'GET');
+            const r = router.routes('/route1', 'GET');
             assert(r.length === 1);
             assert(r[0].uri instanceof RegExp);
             assert(r[0].uri.toString() === new RegExp('^\/route1').toString());
@@ -97,7 +109,7 @@ describe('Router', () => {
 
             router.get('/subroute', new frontexpress.Middleware());
 
-            const r = router.getRoutes('/route1/subroute', 'GET');
+            const r = router.routes('/route1/subroute', 'GET');
             assert(r.length === 1);
             assert(r[0].uri === '/route1/subroute');
         });
@@ -107,7 +119,7 @@ describe('Router', () => {
 
             router.get(new frontexpress.Middleware());
 
-            const r = router.getRoutes('/route1', 'GET');
+            const r = router.routes('/route1', 'GET');
             assert(r.length === 1);
             assert(r[0].uri === '/route1');
         });
@@ -117,7 +129,7 @@ describe('Router', () => {
 
             router.get('/subroute', new frontexpress.Middleware());
 
-            const r = router.getRoutes('/route1/subroute', 'GET');
+            const r = router.routes('/route1/subroute', 'GET');
             assert(r.length === 1);
             assert(r[0].uri === '/route1/subroute');
         });
@@ -127,7 +139,7 @@ describe('Router', () => {
 
             router.get('/subroute  ', new frontexpress.Middleware());
 
-            let r = router.getRoutes('/route1/subroute', 'GET');
+            let r = router.routes('/route1/subroute', 'GET');
             assert(r.length === 1);
             assert(r[0].uri === '/route1/subroute');
 
@@ -137,7 +149,7 @@ describe('Router', () => {
 
             router.get(new frontexpress.Middleware());
 
-            r = router.getRoutes('/route1', 'GET');
+            r = router.routes('/route1', 'GET');
             assert(r.length === 1);
             assert(r[0].uri === '/route1');
         });
@@ -232,7 +244,7 @@ describe('Router', () => {
 
             router.get(middleware);
 
-            const r1 = router.getRoutes('/', 'GET');
+            const r1 = router.routes('/', 'GET');
             assert(r1.length === 1);
             assert(r1[0].uri === '/');
             assert(r1[0].method === 'GET');
@@ -245,7 +257,7 @@ describe('Router', () => {
 
             router.get('/route1', middleware);
 
-            const r1 = router.getRoutes('/route1', 'GET');
+            const r1 = router.routes('/route1', 'GET');
             assert(r1.length === 1);
             assert(r1[0].uri === '/route1');
             assert(r1[0].method === 'GET');
