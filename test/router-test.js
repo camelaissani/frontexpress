@@ -153,6 +153,39 @@ describe('Router', () => {
             assert(r.length === 1);
             assert(r[0].uri === '/route1');
         });
+
+        it('route with query string', () => {
+            let router = new frontexpress.Router('/route1 ');
+
+            router.get('/subroute', new frontexpress.Middleware());
+
+            let r = router.routes('/route1/subroute?a=b&c=d', 'GET');
+            assert(r.length === 1);
+            assert(r[0].uri === '/route1/subroute');
+            assert(r[0].data === undefined)
+        });
+
+        it('route with anchor', () => {
+            let router = new frontexpress.Router('/route1 ');
+
+            router.get('/subroute', new frontexpress.Middleware());
+
+            let r = router.routes('/route1/subroute#a=b&c=d', 'GET');
+            assert(r.length === 1);
+            assert(r[0].uri === '/route1/subroute');
+            assert(r[0].data === undefined)
+        });
+
+        it('route with query string and anchor', () => {
+            let router = new frontexpress.Router('/route1 ');
+
+            router.get('/subroute', new frontexpress.Middleware());
+
+            let r = router.routes('/route1/subroute?a=b&c=d#anchor1', 'GET');
+            assert(r.length === 1);
+            assert(r[0].uri === '/route1/subroute');
+            assert(r[0].data === undefined)
+        });
     });
 
     describe('all method', () => {
@@ -244,11 +277,11 @@ describe('Router', () => {
 
             router.get(middleware);
 
-            const r1 = router.routes('/', 'GET');
-            assert(r1.length === 1);
-            assert(r1[0].uri === '/');
-            assert(r1[0].method === 'GET');
-            assert(r1[0].middleware === middleware);
+            const r = router.routes('/', 'GET');
+            assert(r.length === 1);
+            assert(r[0].uri === '/');
+            assert(r[0].method === 'GET');
+            assert(r[0].middleware === middleware);
         });
 
         it('with path /route1 and middleware as arguments', () => {
@@ -257,11 +290,34 @@ describe('Router', () => {
 
             router.get('/route1', middleware);
 
-            const r1 = router.routes('/route1', 'GET');
-            assert(r1.length === 1);
-            assert(r1[0].uri === '/route1');
-            assert(r1[0].method === 'GET');
-            assert(r1[0].middleware === middleware);
+            const r = router.routes('/route1', 'GET');
+            assert(r.length === 1);
+            assert(r[0].uri === '/route1');
+            assert(r[0].method === 'GET');
+            assert(r[0].middleware === middleware);
+        });
+
+        it('router with regexp and route with /route1', () => {
+            const router = new frontexpress.Router(/^\//);
+            const middleware = new frontexpress.Middleware();
+            try {
+                router.get('/route1', middleware);
+            } catch(ex) {
+                assert(ex instanceof TypeError)
+            }
+        });
+
+        it('router with regexp and route without uri', () => {
+            const router = new frontexpress.Router(/^\/part/);
+            const middleware = new frontexpress.Middleware();
+            router.get(middleware);
+
+            const r = router.routes('/part1', 'GET');
+            assert(r.length === 1);
+            assert(r[0].uri instanceof RegExp);
+            assert(r[0].uri.toString() === new RegExp('^\/part').toString());
+            assert(r[0].method === 'GET');
+            assert(r[0].middleware === middleware);
         });
     });
 });

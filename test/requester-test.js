@@ -4,41 +4,66 @@ import {assert} from 'chai';
 import sinon from 'sinon';
 import jsdom from 'mocha-jsdom';
 import FakeXMLHttpRequest from 'fake-xml-http-request';
-import Requester from '../lib/requester';
+import Requester, {HTTP_METHODS} from '../lib/requester';
 
-function xHttpWillRespond(xhttp, readyState, status, statusText, responseText) {
-    const stub_send = sinon.stub(xhttp, 'send', function() {
-        this.readyState = readyState;
-        this.status = status;
-        this.statusText = statusText;
-        this.responseText = responseText;
-        this.onreadystatechange()
+describe('HTTP_METHODS', () => {
+    it('GET method simple uri', () => {
+        const uriFn = HTTP_METHODS['GET'].uri;
+        const dataFn = HTTP_METHODS['GET'].data;
+
+        assert(uriFn({uri: '/route', data:{a:'b', c:'d'}}) === '/route?a=b&c=d');
+        assert(dataFn({uri: '/route', data:{a:'b', c:'d'}}) === undefined);
     });
 
-    const stub_open = sinon.stub(xhttp, 'open', function() {});
+    it('GET method uri with query string', () => {
+        const uriFn = HTTP_METHODS['GET'].uri;
+        const dataFn = HTTP_METHODS['GET'].data;
 
-    const stub_setRequestHeader = sinon.stub(xhttp, 'setRequestHeader', function() {});
-
-    return {stub_open, stub_send, stub_setRequestHeader};
-}
-
-function xHttpWillThrow(xhttp, sendErrorName, openErrorName) {
-    const stub_send = sinon.stub(xhttp, 'send', function() {
-        if (sendErrorName) {
-            throw {name: sendErrorName};
-        }
+        assert(uriFn({uri: '/route?x=y&z=a', data:{a:'b', c:'d'}}) === '/route?x=y&z=a&a=b&c=d');
+        assert(dataFn({uri: '/route?x=y&z=a', data:{a:'b', c:'d'}}) === undefined);
     });
 
-    const stub_open = sinon.stub(xhttp, 'open', function() {
-        if (openErrorName) {
-            throw {name: openErrorName};
-        }
-    });
+    it('GET method uri with query string and anchor', () => {
+        const uriFn = HTTP_METHODS['GET'].uri;
+        const dataFn = HTTP_METHODS['GET'].data;
 
-    return {stub_open, stub_send};
-}
+        assert(uriFn({uri: '/route?x=y&z=a#anchor1', data:{a:'b', c:'d'}}) === '/route?x=y&z=a&a=b&c=d#anchor1');
+        assert(dataFn({uri: '/route?x=y&z=a#anchor1', data:{a:'b', c:'d'}}) === undefined);
+    });
+});
 
 describe('Requester', () => {
+    function xHttpWillRespond(xhttp, readyState, status, statusText, responseText) {
+        const stub_send = sinon.stub(xhttp, 'send', function() {
+            this.readyState = readyState;
+            this.status = status;
+            this.statusText = statusText;
+            this.responseText = responseText;
+            this.onreadystatechange()
+        });
+
+        const stub_open = sinon.stub(xhttp, 'open', function() {});
+
+        const stub_setRequestHeader = sinon.stub(xhttp, 'setRequestHeader', function() {});
+
+        return {stub_open, stub_send, stub_setRequestHeader};
+    }
+
+    function xHttpWillThrow(xhttp, sendErrorName, openErrorName) {
+        const stub_send = sinon.stub(xhttp, 'send', function() {
+            if (sendErrorName) {
+                throw {name: sendErrorName};
+            }
+        });
+
+        const stub_open = sinon.stub(xhttp, 'open', function() {
+            if (openErrorName) {
+                throw {name: openErrorName};
+            }
+        });
+
+        return {stub_open, stub_send};
+    }
 
     let xhttp;
 
