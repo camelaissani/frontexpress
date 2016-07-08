@@ -2,7 +2,6 @@
 /*global global*/
 import {assert} from 'chai';
 import sinon from 'sinon';
-import jsdom from 'mocha-jsdom';
 import FakeXMLHttpRequest from 'fake-xml-http-request';
 import Requester, {HTTP_METHODS} from '../lib/requester';
 
@@ -66,19 +65,6 @@ describe('Requester', () => {
     }
 
     let xhttp;
-
-    // Init DOM with a fake document
-    // <base> and uri (initial uri) allow to do pushState in jsdom
-    jsdom({
-        html:`
-            <html>
-                <head>
-                    <base href="http://localhost:8080/"></base>
-                </head>
-            </html>
-        `,
-        url: 'http://localhost:8080/'
-    });
 
     beforeEach(() => {
         // Stub XMLHttpRequest

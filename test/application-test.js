@@ -1,6 +1,7 @@
 /*eslint-env mocha*/
 import {assert} from 'chai';
 import sinon from 'sinon';
+import chai from 'chai';
 import frontexpress from '../lib/frontexpress';
 import Requester from '../lib/requester';
 
@@ -25,14 +26,87 @@ describe('Application', () => {
         });
     });
 
+    describe('listen method', () => {
+        let eventFn = {};
+
+        beforeEach(() => {
+            global.document = {};
+            global.window = {
+                addEventListener(eventType, callback) {
+                    eventFn[eventType] = callback;
+                },
+                location: {
+                    pathname: '/route1',
+                    search: '?a=b'
+                }
+            }
+        });
+
+        it('with function middleware readyState===interactive', (done) => {
+            const app = frontexpress();
+            app.use('/route1', (request, response, next) => {
+                done();
+            });
+            app.listen();
+
+            //simulate readystatechange
+            document.readyState = 'interactive';
+            document.onreadystatechange();
+        });
+
+        it('with middleware object readyState===loading', (done) => {
+            const app = frontexpress();
+            const m = new frontexpress.Middleware();
+            sinon.stub(m, 'entered', () => {
+                done();
+            });
+
+            app.use('/route1', m);
+            app.listen();
+
+            //simulate readystatechange
+            document.readyState = 'loading';
+            document.onreadystatechange();
+        });
+
+        it('with middleware object readyState===interactive', (done) => {
+            const app = frontexpress();
+            const m = new frontexpress.Middleware();
+            sinon.stub(m, 'updated', () => {
+                done();
+            });
+
+            app.use('/route1', m);
+            app.listen();
+
+            //simulate readystatechange
+            document.readyState = 'interactive';
+            document.onreadystatechange();
+        });
+
+        it('with middleware object event beforeunload', (done) => {
+            const app = frontexpress();
+            const m = new frontexpress.Middleware();
+            sinon.stub(m, 'exited', () => {
+                done();
+            });
+
+            app.use('/route1', m);
+            app.listen(() => {
+                //simulate beforeunload
+                eventFn['beforeunload']();
+            });
+
+            //simulate readystatechange
+            document.readyState = 'interactive';
+            document.onreadystatechange();
+        });
+    });
+
     describe('set method', () => {
         it('unsupported setting', () => {
             const app = frontexpress();
-            try {
-                app.set('blabla', 'value');
-            } catch (ex) {
-                assert(ex instanceof ReferenceError);
-            }
+            chai.expect(() => app.set('blabla', 'value')).to.throw(ReferenceError);
         });
 
         it('supported setting', () => {
@@ -63,12 +137,19 @@ describe('Application', () => {
         it('bad arguments', () => {
             const app = frontexpress();
             app.set('http-requester', requester);
-            try {
-                app.use('eee');
-            } catch (ex) {
-                assert(ex instanceof TypeError);
-            }
+            chai.expect(() => app.use('eee')).to.throw(TypeError);
+        });
 
+        it('mixing uri and regexp', () => {
+            let router = frontexpress.Router('/subroute');
+            let app = frontexpress();
+            app.set('http-requester', requester);
+            chai.expect(() => app.use(/route/, router)).to.throw(TypeError);
+
+            router = frontexpress.Router(/subroute/);
+            app = frontexpress();
+            app.set('http-requester', requester);
+            chai.expect(() => app.use('/route', router)).to.throw(TypeError);
         });
 
         it('middleware as function on path /', (done) => {
@@ -188,7 +269,7 @@ describe('Application', () => {
 
         it('router on path /', (done) => {
             const spy = sinon.spy();
-            const router = new frontexpress.Router();
+            const router = frontexpress.Router();
             router
                 .get((request, response, next) => {spy()})
                 .post((request, response, next) => {spy()});
@@ -209,7 +290,7 @@ describe('Application', () => {
 
         it('router on path /route1', (done) => {
             const spy = sinon.spy();
-            const router = new frontexpress.Router();
+            const router = frontexpress.Router();
             router
                 .get((request, response, next) => {spy()})
                 .post((request, response, next) => {spy()});
@@ -235,7 +316,7 @@ describe('Application', () => {
             const app = frontexpress();
             app.set('http-requester', requester);
 
-            const router = new frontexpress.Router();
+            const router = frontexpress.Router();
             router.get('/subroute1', middleware);
 
             app.use('/route1', router);
@@ -270,21 +351,9 @@ describe('Application', () => {
         it('bad arguments', () => {
             const app = frontexpress();
             app.set('http-requester', requester);
-            try {
-                app.get('eee');
-            } catch (ex) {
-                assert(ex instanceof TypeError);
-            }
-            try {
-                app.get(new frontexpress.Router());
-            } catch (ex) {
-                assert(ex instanceof TypeError);
-            }
-            try {
-                app.get('/route1', new frontexpress.Router());
-            } catch (ex) {
-                assert(ex instanceof TypeError);
-            }
+            chai.expect(() => app.get('eee')).to.throw(TypeError);
+            chai.expect(() => app.get(frontexpress.Router())).to.throw(TypeError);
+            chai.expect(() => app.get('/route1', frontexpress.Router())).to.throw(TypeError);
         });
 
         it('middleware as function on path /', (done) => {
