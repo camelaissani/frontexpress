@@ -1,9 +1,3 @@
->
->
-> ## Caution README in progress
->
->
-
 # frontexpress
 
  Minimalist front end router framework a la [express](http://expressjs.com/)
@@ -34,13 +28,13 @@ $ npm install frontexpress
 
 ## Quick Start
 
- The quickest way to get started with frontexpress is to clone [frontexpress sample](https://github.com/camelaissani/frontexpress) to generate an application as shown below:
+ The quickest way to get started with frontexpress is to clone [frontexpress-demo](https://github.com/camelaissani/frontexpress-demo) to generate an application as shown below:
 
  Clone the git repository:
  
 ```bash
-$ git clone git@github.com:camelaissani/frontexpress-sample.git
-$ cd frontexpress-sample
+$ git clone git@github.com:camelaissani/frontexpress-demo.git
+$ cd frontexpress-demo
 ```
 
  Install dependencies:
@@ -70,6 +64,17 @@ $ cd frontexpress
 $ npm install
 $ npm test
 ```
+
+## Disclaimer
+
+>
+> In this first version of frontexpress, the API is not completely the miror of the expressjs one.
+>
+> There are some missing methods. Currently, the use, get, post... methods having a middlewares array as parameter are not available.
+> The string pattern to define route paths is not yet implemented.
+>
+> Obviously, the objective is to have the same API as expressjs when the methods make sense browser side.
+>
 
 ## Routing
 
