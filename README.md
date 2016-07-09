@@ -14,10 +14,8 @@ app.get('/', (req, res) => {
   window.alert('Hello World');
 });
  
-// Once DOM is loaded start listening HTTP requests
-document.addEventListener("DOMContentLoaded", (event) => {
-  app.listen();
-});
+// start listening frontend application requests
+app.listen();
 ```
 
 ## Installation
