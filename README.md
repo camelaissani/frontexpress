@@ -7,7 +7,7 @@
 # frontexpress
 
  Minimalist front end router framework a la [express](http://expressjs.com/)
- 
+
  [![Build Status](https://travis-ci.org/camelaissani/frontexpress.svg?branch=master)](https://travis-ci.org/camelaissani/frontexpress)
  [![Coverage Status](https://coveralls.io/repos/github/camelaissani/frontexpress/badge.svg?branch=master)](https://coveralls.io/github/camelaissani/frontexpress?branch=master)
 
@@ -19,7 +19,7 @@ const app = frontexpress();
 app.get('/', (req, res) => {
   window.alert('Hello World');
 });
- 
+
 // Once DOM is loaded start listening HTTP requests
 document.addEventListener("DOMContentLoaded", (event) => {
   app.listen();
@@ -37,7 +37,7 @@ $ npm install frontexpress
  The quickest way to get started with frontexpress is to clone [frontexpress sample](https://github.com/camelaissani/frontexpress) to generate an application as shown below:
 
  Clone the git repository:
- 
+
 ```bash
 $ git clone git@github.com:camelaissani/frontexpress-sample.git
 $ cd frontexpress-sample
@@ -56,14 +56,14 @@ $ npm start
 ```
 
 ## Tests
- 
+
  Clone the git repository:
- 
+
 ```bash
 $ git clone git@github.com:camelaissani/frontexpress.git
 $ cd frontexpress
 ```
- 
+
  Install the dependencies and run the test suite:
 
 ```bash
@@ -77,34 +77,34 @@ $ npm test
 
 Routing allows to link the frontend application with HTTP requests to a particular URI (or path).
 The link can be specific to an HTTP request method (GET, POST, and so on).
- 
+
 The following examples illustrate how to define simple routes.
- 
+
 Listen an HTTP GET request on URI (/):
- 
+
 ```js
-app.get('/', (req, res) => { 
-  window.alert('Hello World'); 
+app.get('/', (req, res) => {
+  window.alert('Hello World');
 });
 ```
- 
+
 Listen an HTTP POST request on URI (/):
- 
+
 ```js
-app.post('/', (req, res) => { 
-  window.alert('Got a POST request at /'); 
+app.post('/', (req, res) => {
+  window.alert('Got a POST request at /');
 });
 ```
 
 ### Route paths
- 
+
 Route paths, in combination with a request method, define the endpoints at which requests can be made.
 Route paths can be strings (see basic routing section), or regular expressions.
- 
+
 This route path matches all GET request paths which start with (/api/):
- 
+
 ```js
-app.get(/^api\//, (req, res) => { 
+app.get(/^api\//, (req, res) => {
   console.log(`api was requested ${req.uri}`);
 });
 ```
@@ -139,9 +139,9 @@ You can create chainable route handlers for a route path by using ```app.route()
 
 ```js
 app.route('/book')
- .get((req, res) => { res.send('Get a random book') })
- .post((req, res) => { res.send('Add a book') })
- .put((req, res) => { res.send('Update the book') });
+ .get((req, res) => { console.log('Get a random book') })
+ .post((req, res) => { console.log('Add a book') })
+ .put((req, res) => { console.log('Update the book') });
 ```
 
 ### frontexpress.Router
@@ -153,23 +153,23 @@ Create a router file named ```birds.js``` in the app directory, with the followi
 ```js
 import frontexpress from 'frontexpress';
 
-const router = frontexpress.Router(); 
+const router = frontexpress.Router();
 
-// middleware that is specific to this router 
+// middleware that is specific to this router
 router.use((req, res, next) => {
-  console.log(`Time: ${Date.now()}`); 
-  next(); 
-}); 
+  console.log(`Time: ${Date.now()}`);
+  next();
+});
 
-// react on home page route 
-router.get('/', function(req, res) => { 
+// react on home page route
+router.get('/', (req, res) => {
   document.querySelector('.content').innerHTML = '<p>Birds home page</p>';
-}); 
+});
 
-// react on about route 
-router.get('/about', (req, res) => { 
-  document.querySelector('.content').innerHTML = '<p>About birds</p>'; 
-}); 
+// react on about route
+router.get('/about', (req, res) => {
+  document.querySelector('.content').innerHTML = '<p>About birds</p>';
+});
 
 export default router;
 ```

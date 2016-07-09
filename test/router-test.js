@@ -163,7 +163,7 @@ describe('Router', () => {
             let r = router.routes('/route1/subroute?a=b&c=d', 'GET');
             assert(r.length === 1);
             assert(r[0].uri === '/route1/subroute');
-            assert(r[0].data === undefined)
+            assert(r[0].data === undefined);
         });
 
         it('route with anchor', () => {
@@ -174,7 +174,7 @@ describe('Router', () => {
             let r = router.routes('/route1/subroute#a=b&c=d', 'GET');
             assert(r.length === 1);
             assert(r[0].uri === '/route1/subroute');
-            assert(r[0].data === undefined)
+            assert(r[0].data === undefined);
         });
 
         it('route with query string and anchor', () => {
@@ -185,7 +185,7 @@ describe('Router', () => {
             let r = router.routes('/route1/subroute?a=b&c=d#anchor1', 'GET');
             assert(r.length === 1);
             assert(r[0].uri === '/route1/subroute');
-            assert(r[0].data === undefined)
+            assert(r[0].data === undefined);
         });
     });
 

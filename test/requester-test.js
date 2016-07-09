@@ -38,7 +38,7 @@ describe('Requester', () => {
             this.status = status;
             this.statusText = statusText;
             this.responseText = responseText;
-            this.onreadystatechange()
+            this.onreadystatechange();
         });
 
         const stub_open = sinon.stub(xhttp, 'open', function() {});

@@ -38,7 +38,7 @@ describe('Application', () => {
                     pathname: '/route1',
                     search: '?a=b'
                 }
-            }
+            };
         });
 
         it('with function middleware readyState===interactive', (done) => {
@@ -156,7 +156,7 @@ describe('Application', () => {
 
             const app = frontexpress();
             app.set('http-requester', requester);
-            app.use((request, response, next) => {spy()});
+            app.use((request, response, next) => {spy();});
 
             app.httpGet('/', (request, response) => {
                 assert(spy.callCount === 1);
@@ -173,7 +173,7 @@ describe('Application', () => {
 
             const app = frontexpress();
             app.set('http-requester', requester);
-            app.use('/route1', (request, response, next) => {spy()});
+            app.use('/route1', (request, response, next) => {spy();});
 
             app.httpGet('/route1', (request, response) => {
                 assert(spy.callCount === 1);
@@ -198,7 +198,7 @@ describe('Application', () => {
 
             const app = frontexpress();
             app.set('http-requester', requester);
-            app.use((request, response, next) => {spy()});
+            app.use((request, response, next) => {spy();});
 
             app.httpGet('/', null, (request, response) => {
                 assert(spy.callCount === 1);
@@ -270,8 +270,8 @@ describe('Application', () => {
             const spy = sinon.spy();
             const router = frontexpress.Router();
             router
-                .get((request, response, next) => {spy()})
-                .post((request, response, next) => {spy()});
+                .get((request, response, next) => {spy();})
+                .post((request, response, next) => {spy();});
 
             const app = frontexpress();
             app.set('http-requester', requester);
@@ -291,8 +291,8 @@ describe('Application', () => {
             const spy = sinon.spy();
             const router = frontexpress.Router();
             router
-                .get((request, response, next) => {spy()})
-                .post((request, response, next) => {spy()});
+                .get((request, response, next) => {spy();})
+                .post((request, response, next) => {spy();});
 
             const app = frontexpress();
             app.set('http-requester', requester);
@@ -355,15 +355,14 @@ describe('Application', () => {
                     app.httpGet('/route2/subroute2', (request, response) => {
                         assert(spy2.calledOnce);
                         done();
+                    },
+                    (request, response) => {
+                        done(response);
+                    });
                 },
                 (request, response) => {
                     done(response);
                 });
-            },
-            (request, response) => {
-                done(response);
-            });
-
         });
     });
 
@@ -397,7 +396,7 @@ describe('Application', () => {
 
             const app = frontexpress();
             app.set('http-requester', requester);
-            app.get((request, respons, next) => {spy()});
+            app.get((request, respons, next) => {spy();});
 
             app.httpGet('/', (request, response) => {
                 assert(spy.callCount === 1);
@@ -414,7 +413,7 @@ describe('Application', () => {
 
             const app = frontexpress();
             app.set('http-requester', requester);
-            app.get('/route1', (request, response, next) => {spy()});
+            app.get('/route1', (request, response, next) => {spy();});
 
             app.httpGet('/route1', (request, response) => {
                 assert(spy.callCount === 1);
@@ -479,7 +478,7 @@ describe('Application', () => {
 
             const app = frontexpress();
             app.set('http-requester', requester);
-            app.route().get((request, response, next) => {spy()});
+            app.route().get((request, response, next) => {spy();});
 
             app.httpGet('/', (request, response) => {
                 assert(spy.calledOnce);
@@ -496,7 +495,7 @@ describe('Application', () => {
 
             const app = frontexpress();
             app.set('http-requester', requester);
-            app.route('/').get((request, response, next) => {spy()});
+            app.route('/').get((request, response, next) => {spy();});
 
             app.httpGet('/', (request, response) => {
                 assert(spy.calledOnce);
@@ -513,7 +512,7 @@ describe('Application', () => {
 
             const app = frontexpress();
             app.set('http-requester', requester);
-            app.route('/route1').get((request, response, next) => {spy()});
+            app.route('/route1').get((request, response, next) => {spy();});
 
             app.httpGet('/route1', (request, response) => {
                 assert(spy.calledOnce);
@@ -530,7 +529,7 @@ describe('Application', () => {
 
             const app = frontexpress();
             app.set('http-requester', requester);
-            app.route().get('/subroute1', (request, response, next) => {spy()});
+            app.route().get('/subroute1', (request, response, next) => {spy();});
 
             app.httpGet('/subroute1', (request, response) => {
                 assert(spy.calledOnce);
@@ -546,7 +545,7 @@ describe('Application', () => {
 
             const app = frontexpress();
             app.set('http-requester', requester);
-            app.route('/').get('/subroute1', (request, response, next) => {spy()});
+            app.route('/').get('/subroute1', (request, response, next) => {spy();});
 
             app.httpGet('/subroute1', (request, response) => {
                 assert(spy.calledOnce);
@@ -562,7 +561,7 @@ describe('Application', () => {
 
             const app = frontexpress();
             app.set('http-requester', requester);
-            app.route('/route1').get('/subroute1', (request, response, next) => {spy()});
+            app.route('/route1').get('/subroute1', (request, response, next) => {spy();});
 
             app.httpGet('/route1/subroute1', (request, response) => {
                 assert(spy.calledOnce);
@@ -753,9 +752,9 @@ describe('Application', () => {
             const app = frontexpress();
             app.set('http-requester', requester);
 
-            const m1 = (req, res, next) => {next()};
+            const m1 = (req, res, next) => {next();};
             const m2 = (req, res, next) => {};
-            const m3 = (req, res, next) => {next()};
+            const m3 = (req, res, next) => {next();};
 
             const spy_m1 = sinon.spy(m1);
             const spy_m2 = sinon.spy(m2);
