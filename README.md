@@ -28,26 +28,7 @@ $ npm install frontexpress
 
 ## Quick Start
 
- The quickest way to get started with frontexpress is to clone [frontexpress-demo](https://github.com/camelaissani/frontexpress-demo) to generate an application as shown below:
-
- Clone the git repository:
- 
-```bash
-$ git clone git@github.com:camelaissani/frontexpress-demo.git
-$ cd frontexpress-demo
-```
-
- Install dependencies:
-
-```bash
-$ npm install
-```
-
- Start the server:
-
-```bash
-$ npm start
-```
+ The quickest way to get started with frontexpress is to clone [frontexpress-demo](https://github.com/camelaissani/frontexpress-demo)
 
 ## Tests
  
