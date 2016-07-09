@@ -14,6 +14,13 @@ app.get('/', (req, res) => {
   window.alert('Hello World');
 });
 
+// listen HTTP GET request on API (/api/xxx)
+// update page content with response
+app.get(/^\/api\//, (req, res, next) => {
+  document.querySelector('.content').innerHTML = res.responseText;
+  next();
+});
+
 // start listening frontend application requests
 app.listen();
 ```
