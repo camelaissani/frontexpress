@@ -1,7 +1,6 @@
 /*eslint-env mocha*/
-import {assert} from 'chai';
+import chai, {assert} from 'chai';
 import sinon from 'sinon';
-import chai from 'chai';
 import frontexpress from '../lib/frontexpress';
 import Requester from '../lib/requester';
 
@@ -56,7 +55,7 @@ describe('Application', () => {
 
         it('with middleware object readyState===loading', (done) => {
             const app = frontexpress();
-            const m = new frontexpress.Middleware();
+            const m = frontexpress.Middleware();
             sinon.stub(m, 'entered', () => {
                 done();
             });
@@ -71,7 +70,7 @@ describe('Application', () => {
 
         it('with middleware object readyState===interactive', (done) => {
             const app = frontexpress();
-            const m = new frontexpress.Middleware();
+            const m = frontexpress.Middleware();
             sinon.stub(m, 'updated', () => {
                 done();
             });
@@ -86,7 +85,7 @@ describe('Application', () => {
 
         it('with middleware object event beforeunload', (done) => {
             const app = frontexpress();
-            const m = new frontexpress.Middleware();
+            const m = frontexpress.Middleware();
             sinon.stub(m, 'exited', () => {
                 done();
             });
@@ -209,7 +208,7 @@ describe('Application', () => {
         });
 
         it('middleware as object on path /', (done) => {
-            const middleware = new frontexpress.Middleware('on path /');
+            const middleware = frontexpress.Middleware('on path /');
             const spy = sinon.spy(middleware, 'updated');
 
             const app = frontexpress();
@@ -227,7 +226,7 @@ describe('Application', () => {
         });
 
         it('middleware as object on path /route1', (done) => {
-            const middleware = new frontexpress.Middleware('on path /route1');
+            const middleware = frontexpress.Middleware('on path /route1');
             const spy = sinon.spy(middleware, 'updated');
 
             const app = frontexpress();
@@ -253,7 +252,7 @@ describe('Application', () => {
                 );
             });
 
-            const middleware = new frontexpress.Middleware('on path /');
+            const middleware = frontexpress.Middleware('on path /');
             const spy = sinon.spy(middleware, 'failed');
 
             const app = frontexpress();
@@ -310,7 +309,7 @@ describe('Application', () => {
         });
 
         it('router with base uri', (done)=> {
-            const middleware = new frontexpress.Middleware('get middleware');
+            const middleware = frontexpress.Middleware('get middleware');
             const spy = sinon.spy(middleware, 'updated');
 
             const app = frontexpress();
@@ -328,6 +327,43 @@ describe('Application', () => {
             (request, response) => {
                 done(response);
             });
+        });
+
+        it('use two routers', (done)=> {
+
+            const router1 = frontexpress.Router();
+            const m1 = frontexpress.Middleware();
+            const spy1 = sinon.spy(m1, 'updated');
+            router1.get('/subroute1', m1);
+
+            const router2 = frontexpress.Router();
+            const m2 = frontexpress.Middleware();
+            const spy2 = sinon.spy(m2, 'updated');
+            router2.get('/subroute2', m2);
+
+            assert(router1 !== router2);
+
+
+            const app = frontexpress();
+            app.set('http-requester', requester);
+            app.use(/^\/route1/, router1);
+            app.use(/^\/route2/, router2);
+
+            app.httpGet('/route1/subroute1',
+                (request, response) => {
+                    assert(spy1.calledOnce);
+                    app.httpGet('/route2/subroute2', (request, response) => {
+                        assert(spy2.calledOnce);
+                        done();
+                },
+                (request, response) => {
+                    done(response);
+                });
+            },
+            (request, response) => {
+                done(response);
+            });
+
         });
     });
 
@@ -391,7 +427,7 @@ describe('Application', () => {
         });
 
         it('middleware as object on path /', (done) => {
-            const middleware = new frontexpress.Middleware('on path /');
+            const middleware = frontexpress.Middleware('on path /');
             const spy = sinon.spy(middleware, 'updated');
 
             const app = frontexpress();
@@ -409,7 +445,7 @@ describe('Application', () => {
         });
 
         it('middleware as object on path /route1', (done) => {
-            const middleware = new frontexpress.Middleware('on path /route1');
+            const middleware = frontexpress.Middleware('on path /route1');
             const spy = sinon.spy(middleware, 'updated');
 
             const app = frontexpress();
@@ -553,7 +589,7 @@ describe('Application', () => {
             const app = frontexpress();
             app.set('http-requester', requester);
 
-            const getMiddleware = new frontexpress.Middleware('get middleware');
+            const getMiddleware = frontexpress.Middleware('get middleware');
             const spy_get_entered = sinon.spy(getMiddleware, 'entered');
             const spy_get_updated = sinon.spy(getMiddleware, 'updated');
             const spy_get_exited = sinon.spy(getMiddleware, 'exited');
@@ -581,17 +617,17 @@ describe('Application', () => {
             const app = frontexpress();
             app.set('http-requester', requester);
 
-            const allMiddleware = new frontexpress.Middleware('all middleware');
+            const allMiddleware = frontexpress.Middleware('all middleware');
             const spy_all_entered = sinon.spy(allMiddleware, 'entered');
             const spy_all_updated = sinon.spy(allMiddleware, 'updated');
             const spy_all_exited = sinon.spy(allMiddleware, 'exited');
 
-            const getMiddleware = new frontexpress.Middleware('get middleware');
+            const getMiddleware = frontexpress.Middleware('get middleware');
             const spy_get_entered = sinon.spy(getMiddleware, 'entered');
             const spy_get_updated = sinon.spy(getMiddleware, 'updated');
             const spy_get_exited = sinon.spy(getMiddleware, 'exited');
 
-            const postMiddleware = new frontexpress.Middleware('post middleware');
+            const postMiddleware = frontexpress.Middleware('post middleware');
             const spy_post_entered = sinon.spy(postMiddleware, 'entered');
             const spy_post_updated = sinon.spy(postMiddleware, 'updated');
             const spy_post_exited = sinon.spy(postMiddleware, 'exited');
@@ -664,7 +700,7 @@ describe('Application', () => {
             const app = frontexpress();
             app.set('http-requester', requester);
 
-            const getMiddleware = new frontexpress.Middleware('get middleware');
+            const getMiddleware = frontexpress.Middleware('get middleware');
             const spy_get_failed = sinon.spy(getMiddleware, 'failed');
 
 
@@ -683,10 +719,10 @@ describe('Application', () => {
             const app = frontexpress();
             app.set('http-requester', requester);
 
-            const m1 = new frontexpress.Middleware('m1');
-            const m2 = new frontexpress.Middleware('m2');
+            const m1 = frontexpress.Middleware('m1');
+            const m2 = frontexpress.Middleware('m2');
             m2.next = () => false;
-            const m3 = new frontexpress.Middleware('m3');
+            const m3 = frontexpress.Middleware('m3');
 
             const spy_m1 = sinon.spy(m1, 'updated');
             const spy_m2 = sinon.spy(m2, 'updated');
