@@ -2,7 +2,7 @@
 import chai, {assert} from 'chai';
 import sinon from 'sinon';
 import frontexpress from '../lib/frontexpress';
-import {HTTP_METHODS} from '../lib/requester';
+import HTTP_METHODS from '../lib/methods';
 
 describe('Router', () => {
 
@@ -207,7 +207,7 @@ describe('Router', () => {
             const middleware = frontexpress.Middleware();
 
             const spied_methods = [];
-            for (const method of Object.keys(HTTP_METHODS)) {
+            for (const method of HTTP_METHODS) {
                 spied_methods.push(sinon.spy(router, method.toLowerCase()));
             }
 
@@ -223,7 +223,7 @@ describe('Router', () => {
             const middleware = frontexpress.Middleware();
 
             const spied_methods = [];
-            for (const method of Object.keys(HTTP_METHODS)) {
+            for (const method of HTTP_METHODS) {
                 spied_methods.push(sinon.spy(router, method.toLowerCase()));
             }
 

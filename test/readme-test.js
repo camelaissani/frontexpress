@@ -50,7 +50,7 @@ describe('Test sample from README', () => {
         const h3 = (req, res, next) => { spy_log('h3!'); next(); };
 
         const app = frontexpress();
-        app.set('http-requester', requester);
+        app.set('http requester', requester);
 
         app.get('/example/a', h1);
         app.get('/example/a', h2);
@@ -77,7 +77,7 @@ describe('Test sample from README', () => {
         const spy_log = sinon.spy();
 
         const app = frontexpress();
-        app.set('http-requester', requester);
+        app.set('http requester', requester);
 
         app.route('/book')
             .get((req, res) => { spy_log('Get a random book');})
@@ -128,7 +128,7 @@ describe('Test sample from README', () => {
         });
 
         const app = frontexpress();
-        app.set('http-requester', requester);
+        app.set('http requester', requester);
         app.use('/birds', router);
 
         // make an ajax request on /birds

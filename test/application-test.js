@@ -102,17 +102,23 @@ describe('Application', () => {
         });
     });
 
-    describe('set method', () => {
-        it('unsupported setting', () => {
+    describe('set/get setting method', () => {
+        it('custom setting', () => {
             const app = frontexpress();
-            chai.expect(() => app.set('blabla', 'value')).to.throw(ReferenceError);
+            app.set('blabla', 'value');
+            assert(app.get('blabla') === 'value');
         });
 
-        it('supported setting', () => {
+        it('core setting', () => {
             const requester = new Requester();
             const app = frontexpress();
-            app.set('http-requester', requester);
-            assert(app.requester === requester);
+            app.set('http requester', requester);
+            assert(app.get('http requester') === requester);
+        });
+
+        it('bad core setting', () => {
+            const app = frontexpress();
+            chai.expect(() => (app.set('http requester', 'not an object with fetch function'))).to.throw(TypeError);
         });
     });
 
@@ -129,25 +135,25 @@ describe('Application', () => {
 
         it('no arguments', () => {
             const app = frontexpress();
-            app.set('http-requester', requester);
+            app.set('http requester', requester);
             assert.throws(app.use, TypeError);
         });
 
         it('bad arguments', () => {
             const app = frontexpress();
-            app.set('http-requester', requester);
+            app.set('http requester', requester);
             chai.expect(() => app.use('eee')).to.throw(TypeError);
         });
 
         it('mixing uri and regexp', () => {
             let router = frontexpress.Router('/subroute');
             let app = frontexpress();
-            app.set('http-requester', requester);
+            app.set('http requester', requester);
             chai.expect(() => app.use(/route/, router)).to.throw(TypeError);
 
             router = frontexpress.Router(/subroute/);
             app = frontexpress();
-            app.set('http-requester', requester);
+            app.set('http requester', requester);
             chai.expect(() => app.use('/route', router)).to.throw(TypeError);
         });
 
@@ -155,7 +161,7 @@ describe('Application', () => {
             const spy = sinon.spy();
 
             const app = frontexpress();
-            app.set('http-requester', requester);
+            app.set('http requester', requester);
             app.use((request, response, next) => {spy();});
 
             app.httpGet('/', (request, response) => {
@@ -172,7 +178,7 @@ describe('Application', () => {
             const spy = sinon.spy();
 
             const app = frontexpress();
-            app.set('http-requester', requester);
+            app.set('http requester', requester);
             app.use('/route1', (request, response, next) => {spy();});
 
             app.httpGet('/route1', (request, response) => {
@@ -197,7 +203,7 @@ describe('Application', () => {
             const spy = sinon.spy();
 
             const app = frontexpress();
-            app.set('http-requester', requester);
+            app.set('http requester', requester);
             app.use((request, response, next) => {spy();});
 
             app.httpGet('/', null, (request, response) => {
@@ -212,7 +218,7 @@ describe('Application', () => {
             const spy = sinon.spy(middleware, 'updated');
 
             const app = frontexpress();
-            app.set('http-requester', requester);
+            app.set('http requester', requester);
             app.use(middleware);
 
             app.httpGet('/', (request, response) => {
@@ -230,7 +236,7 @@ describe('Application', () => {
             const spy = sinon.spy(middleware, 'updated');
 
             const app = frontexpress();
-            app.set('http-requester', requester);
+            app.set('http requester', requester);
             app.use('/route1', middleware);
 
             app.httpGet('/route1', (request, response) => {
@@ -256,7 +262,7 @@ describe('Application', () => {
             const spy = sinon.spy(middleware, 'failed');
 
             const app = frontexpress();
-            app.set('http-requester', requester);
+            app.set('http requester', requester);
             app.use(middleware);
 
             app.httpGet('/', null, (request, response) => {
@@ -274,7 +280,7 @@ describe('Application', () => {
                 .post((request, response, next) => {spy();});
 
             const app = frontexpress();
-            app.set('http-requester', requester);
+            app.set('http requester', requester);
             app.use(router);
 
             app.httpGet('/', (request, response) => {
@@ -295,7 +301,7 @@ describe('Application', () => {
                 .post((request, response, next) => {spy();});
 
             const app = frontexpress();
-            app.set('http-requester', requester);
+            app.set('http requester', requester);
             app.use('/route1', router);
 
             app.httpGet('/route1', (request, response) => {
@@ -313,7 +319,7 @@ describe('Application', () => {
             const spy = sinon.spy(middleware, 'updated');
 
             const app = frontexpress();
-            app.set('http-requester', requester);
+            app.set('http requester', requester);
 
             const router = frontexpress.Router();
             router.get('/subroute1', middleware);
@@ -345,7 +351,7 @@ describe('Application', () => {
 
 
             const app = frontexpress();
-            app.set('http-requester', requester);
+            app.set('http requester', requester);
             app.use(/^\/route1/, router1);
             app.use(/^\/route2/, router2);
 
@@ -379,14 +385,13 @@ describe('Application', () => {
 
         it('no arguments', () => {
             const app = frontexpress();
-            app.set('http-requester', requester);
+            app.set('http requester', requester);
             assert.throws(app.get, TypeError);
         });
 
         it('bad arguments', () => {
             const app = frontexpress();
-            app.set('http-requester', requester);
-            chai.expect(() => app.get('eee')).to.throw(TypeError);
+            app.set('http requester', requester);
             chai.expect(() => app.get(frontexpress.Router())).to.throw(TypeError);
             chai.expect(() => app.get('/route1', frontexpress.Router())).to.throw(TypeError);
         });
@@ -395,7 +400,7 @@ describe('Application', () => {
             const spy = sinon.spy();
 
             const app = frontexpress();
-            app.set('http-requester', requester);
+            app.set('http requester', requester);
             app.get((request, respons, next) => {spy();});
 
             app.httpGet('/', (request, response) => {
@@ -412,7 +417,7 @@ describe('Application', () => {
             const spy = sinon.spy();
 
             const app = frontexpress();
-            app.set('http-requester', requester);
+            app.set('http requester', requester);
             app.get('/route1', (request, response, next) => {spy();});
 
             app.httpGet('/route1', (request, response) => {
@@ -430,7 +435,7 @@ describe('Application', () => {
             const spy = sinon.spy(middleware, 'updated');
 
             const app = frontexpress();
-            app.set('http-requester', requester);
+            app.set('http requester', requester);
             app.get(middleware);
 
             app.httpGet('/', (request, response) => {
@@ -448,7 +453,7 @@ describe('Application', () => {
             const spy = sinon.spy(middleware, 'updated');
 
             const app = frontexpress();
-            app.set('http-requester', requester);
+            app.set('http requester', requester);
             app.get(middleware);
 
             app.httpGet('/route1', (request, response) => {
@@ -459,6 +464,24 @@ describe('Application', () => {
                     done();
                 });
             });
+        });
+    });
+
+    describe('post method', () => {
+        beforeEach(()=>{
+            requester = new Requester();
+            sinon.stub(requester, 'fetch', ({uri, method, headers, data}, resolve, reject) => {
+                resolve(
+                    {uri, method, headers, data},
+                    {status: 200, statusText: 'OK', responseText:''}
+                );
+            });
+        });
+
+        it('no arguments', () => {
+            const app = frontexpress();
+            app.set('http requester', requester);
+            assert.throws(app.post, TypeError);
         });
     });
 
@@ -477,7 +500,7 @@ describe('Application', () => {
             const spy = sinon.spy();
 
             const app = frontexpress();
-            app.set('http-requester', requester);
+            app.set('http requester', requester);
             app.route().get((request, response, next) => {spy();});
 
             app.httpGet('/', (request, response) => {
@@ -494,7 +517,7 @@ describe('Application', () => {
             const spy = sinon.spy();
 
             const app = frontexpress();
-            app.set('http-requester', requester);
+            app.set('http requester', requester);
             app.route('/').get((request, response, next) => {spy();});
 
             app.httpGet('/', (request, response) => {
@@ -511,7 +534,7 @@ describe('Application', () => {
             const spy = sinon.spy();
 
             const app = frontexpress();
-            app.set('http-requester', requester);
+            app.set('http requester', requester);
             app.route('/route1').get((request, response, next) => {spy();});
 
             app.httpGet('/route1', (request, response) => {
@@ -528,7 +551,7 @@ describe('Application', () => {
             const spy = sinon.spy();
 
             const app = frontexpress();
-            app.set('http-requester', requester);
+            app.set('http requester', requester);
             app.route().get('/subroute1', (request, response, next) => {spy();});
 
             app.httpGet('/subroute1', (request, response) => {
@@ -544,7 +567,7 @@ describe('Application', () => {
             const spy = sinon.spy();
 
             const app = frontexpress();
-            app.set('http-requester', requester);
+            app.set('http requester', requester);
             app.route('/').get('/subroute1', (request, response, next) => {spy();});
 
             app.httpGet('/subroute1', (request, response) => {
@@ -560,7 +583,7 @@ describe('Application', () => {
             const spy = sinon.spy();
 
             const app = frontexpress();
-            app.set('http-requester', requester);
+            app.set('http requester', requester);
             app.route('/route1').get('/subroute1', (request, response, next) => {spy();});
 
             app.httpGet('/route1/subroute1', (request, response) => {
@@ -586,7 +609,7 @@ describe('Application', () => {
 
         it('http GET request', (done) => {
             const app = frontexpress();
-            app.set('http-requester', requester);
+            app.set('http requester', requester);
 
             const getMiddleware = frontexpress.Middleware('get middleware');
             const spy_get_entered = sinon.spy(getMiddleware, 'entered');
@@ -614,7 +637,7 @@ describe('Application', () => {
 
         it('http GET followed by http POST requests', (done) => {
             const app = frontexpress();
-            app.set('http-requester', requester);
+            app.set('http requester', requester);
 
             const allMiddleware = frontexpress.Middleware('all middleware');
             const spy_all_entered = sinon.spy(allMiddleware, 'entered');
@@ -697,7 +720,7 @@ describe('Application', () => {
                 );
             });
             const app = frontexpress();
-            app.set('http-requester', requester);
+            app.set('http requester', requester);
 
             const getMiddleware = frontexpress.Middleware('get middleware');
             const spy_get_failed = sinon.spy(getMiddleware, 'failed');
@@ -716,7 +739,7 @@ describe('Application', () => {
 
         it('next method', (done) => {
             const app = frontexpress();
-            app.set('http-requester', requester);
+            app.set('http requester', requester);
 
             const m1 = frontexpress.Middleware('m1');
             const m2 = frontexpress.Middleware('m2');
@@ -750,7 +773,7 @@ describe('Application', () => {
 
         it('next method', (done) => {
             const app = frontexpress();
-            app.set('http-requester', requester);
+            app.set('http requester', requester);
 
             const m1 = (req, res, next) => {next();};
             const m2 = (req, res, next) => {};

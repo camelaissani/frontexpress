@@ -1,35 +1,8 @@
 /*eslint-env mocha*/
 /*global global*/
-import {assert} from 'chai';
+import chai, {assert} from 'chai';
 import sinon from 'sinon';
-import FakeXMLHttpRequest from 'fake-xml-http-request';
-import Requester, {HTTP_METHODS} from '../lib/requester';
-
-describe('HTTP_METHODS', () => {
-    it('GET method simple uri', () => {
-        const uriFn = HTTP_METHODS['GET'].uri;
-        const dataFn = HTTP_METHODS['GET'].data;
-
-        assert(uriFn({uri: '/route', data:{a:'b', c:'d'}}) === '/route?a=b&c=d');
-        assert(dataFn({uri: '/route', data:{a:'b', c:'d'}}) === undefined);
-    });
-
-    it('GET method uri with query string', () => {
-        const uriFn = HTTP_METHODS['GET'].uri;
-        const dataFn = HTTP_METHODS['GET'].data;
-
-        assert(uriFn({uri: '/route?x=y&z=a', data:{a:'b', c:'d'}}) === '/route?x=y&z=a&a=b&c=d');
-        assert(dataFn({uri: '/route?x=y&z=a', data:{a:'b', c:'d'}}) === undefined);
-    });
-
-    it('GET method uri with query string and anchor', () => {
-        const uriFn = HTTP_METHODS['GET'].uri;
-        const dataFn = HTTP_METHODS['GET'].data;
-
-        assert(uriFn({uri: '/route?x=y&z=a#anchor1', data:{a:'b', c:'d'}}) === '/route?x=y&z=a&a=b&c=d#anchor1');
-        assert(dataFn({uri: '/route?x=y&z=a#anchor1', data:{a:'b', c:'d'}}) === undefined);
-    });
-});
+import Requester from '../lib/requester';
 
 describe('Requester', () => {
     function xHttpWillRespond(xhttp, readyState, status, statusText, responseText) {
@@ -51,13 +24,17 @@ describe('Requester', () => {
     function xHttpWillThrow(xhttp, sendErrorName, openErrorName) {
         const stub_send = sinon.stub(xhttp, 'send', function() {
             if (sendErrorName) {
-                throw {name: sendErrorName};
+                const e = new Error(sendErrorName);
+                e.name = sendErrorName;
+                throw e;
             }
         });
 
         const stub_open = sinon.stub(xhttp, 'open', function() {
             if (openErrorName) {
-                throw {name: openErrorName};
+                const e = new Error(openErrorName);
+                e.name = openErrorName;
+                throw e;
             }
         });
 
@@ -67,8 +44,11 @@ describe('Requester', () => {
     let xhttp;
 
     beforeEach(() => {
-        // Stub XMLHttpRequest
-        xhttp = new FakeXMLHttpRequest();
+        xhttp = {
+            setRequestHeader(){},
+            open(){},
+            send(){}
+        };
         global.XMLHttpRequest = () => {
             return xhttp;
         };
@@ -79,15 +59,27 @@ describe('Requester', () => {
         it('with data', (done) => {
             const requester = new Requester();
 
-            const {stub_open, stub_send} = xHttpWillRespond(xhttp, 4, 200, '', '<p>content!</p>');
+            xHttpWillRespond(xhttp, 4, 200, '', '<p>content!</p>');
 
             requester.fetch({method: 'GET', uri:'/route1', data:{p1: 'a', p2: 'b', p3: 'c'}},
                 (request, response) => {
-                    assert(request.uri === '/route1?p1=a&p2=b&p3=c');
+                    assert(request.method === 'GET');
+                    assert(request.uri === '/route1');
+                    assert(request.data !== undefined);
+                    assert(request.data.p1 === 'a');
+                    assert(request.data.p2 === 'b');
+                    assert(request.data.p3 === 'c');
+
+                    assert(response.status === 200);
+                    assert(response.statusText === 'OK');
+                    assert(response.responseText === '<p>content!</p>');
+                    assert(response.errorThrown === undefined);
+                    assert(response.errors === undefined);
+
                     done();
                 },
-                (err) => {
-                    done(err);
+                (request, response) => {
+                    done(response.error);
                 });
         });
 
@@ -101,8 +93,8 @@ describe('Requester', () => {
                 assert(stub_send.calledOnce);
                 assert(stub_open.calledBefore(stub_send));
 
-                assert(request.uri === '/route1');
                 assert(request.method === 'GET');
+                assert(request.uri === '/route1');
                 assert(request.data === undefined);
 
                 assert(response.status === 200);
@@ -113,8 +105,8 @@ describe('Requester', () => {
 
                 done();
             },
-            (error) => {
-                done(error);
+            (request, response) => {
+                done(response.error);
             });
         });
     });
@@ -126,7 +118,7 @@ describe('Requester', () => {
 
             const {stub_open, stub_send, stub_setRequestHeader} = xHttpWillRespond(xhttp, 4, 200, '', '<p>content!</p>');
 
-            requester.fetch({method: 'POST', uri:'/route1', data:{p1: 'a', p2: 'b', p3: 'c'}},
+            requester.fetch({method: 'POST', uri:'/route1', headers:{'head1':'value1'}, data:{p1: 'a', p2: 'b', p3: 'c'}},
                 (request, response) => {
                     assert(stub_open.calledOnce);
                     assert(stub_setRequestHeader.calledOnce);
@@ -135,13 +127,23 @@ describe('Requester', () => {
                     assert(stub_setRequestHeader.calledAfter(stub_open));
                     assert(stub_setRequestHeader.calledBefore(stub_send));
 
+                    assert(request.method === 'POST');
                     assert(request.uri === '/route1');
-                    assert(request.headers['Content-type'] === 'application/x-www-form-urlencoded');
-                    assert(request.data === 'p1=a&p2=b&p3=c');
+                    assert(request.data !== undefined);
+                    assert(request.data.p1 === 'a');
+                    assert(request.data.p2 === 'b');
+                    assert(request.data.p3 === 'c');
+
+                    assert(response.status === 200);
+                    assert(response.statusText === 'OK');
+                    assert(response.responseText === '<p>content!</p>');
+                    assert(response.errorThrown === undefined);
+                    assert(response.errors === undefined);
+
                     done();
                 },
-                (err) => {
-                    done(err);
+                (request, response) => {
+                    done(response.error);
                 });
         });
 
@@ -153,19 +155,18 @@ describe('Requester', () => {
             requester.fetch({method: 'POST', uri:'/route1'},
                 (request, response) => {
                     assert(stub_open.calledOnce);
-                    assert(stub_setRequestHeader.calledOnce);
+                    assert(stub_setRequestHeader.callCount === 0);
                     assert(stub_send.calledOnce);
                     assert(stub_open.calledBefore(stub_send));
-                    assert(stub_setRequestHeader.calledAfter(stub_open));
-                    assert(stub_setRequestHeader.calledBefore(stub_send));
 
+                    assert(request.method === 'POST');
                     assert(request.uri === '/route1');
-                    assert(request.headers['Content-type'] === 'application/x-www-form-urlencoded');
                     assert(request.data === undefined);
+
                     done();
                 },
-                (err) => {
-                    done(err);
+                (request, response) => {
+                    done(response.error);
                 });
         });
 
@@ -177,20 +178,20 @@ describe('Requester', () => {
             requester.fetch({method: 'POST', uri:'/route1', headers: {'Accept-Charset': 'utf-8'}},
                 (request, response) => {
                     assert(stub_open.calledOnce);
-                    assert(stub_setRequestHeader.calledTwice);
+                    assert(stub_setRequestHeader.calledOnce);
                     assert(stub_send.calledOnce);
                     assert(stub_open.calledBefore(stub_send));
                     assert(stub_setRequestHeader.calledAfter(stub_open));
                     assert(stub_setRequestHeader.calledBefore(stub_send));
 
+                    assert(request.method === 'POST');
                     assert(request.uri === '/route1');
-                    assert(request.headers['Content-type'] === 'application/x-www-form-urlencoded');
                     assert(request.headers['Accept-Charset'] === 'utf-8');
                     assert(request.data === undefined);
                     done();
                 },
-                (err) => {
-                    done(err);
+                (request, response) => {
+                    done(response.error);
                 });
         });
     });
@@ -377,24 +378,15 @@ describe('Requester', () => {
                 });
         });
 
-        it('request returns unknown error', (done) => {
+        it('request returns unknown error', () => {
             const requester = new Requester();
 
             const {stub_open, stub_send} = xHttpWillThrow(xhttp, 'BlaBlaError');
 
-            requester.fetch({method: 'GET', uri:'/route1'}, null,
-                (request, response) => {
-                    assert(stub_send.calledOnce);
-                    assert(stub_open.calledOnce);
+            chai.expect(() => {
+                requester.fetch({method: 'GET', uri:'/route1'});
+            }).to.throw(/BlaBlaError/);
 
-                    assert(response.status === undefined);
-                    assert(response.statusText === undefined);
-                    assert(response.responseText === undefined);
-                    assert(response.errorThrown.name === 'BlaBlaError');
-                    assert(response.errors.length !== 0);
-
-                    done();
-                });
         });
     });
 });
