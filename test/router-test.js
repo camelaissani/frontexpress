@@ -17,6 +17,16 @@ describe('Router', () => {
         });
     });
 
+    describe('use method', () => {
+        const router = frontexpress.Router();
+        chai.expect(() => {
+            router.use();
+        }).to.throw(TypeError);
+        chai.expect(() => {
+            router.use('dddd');
+        }).to.throw(TypeError);
+    });
+
     describe('visited method', () => {
         it('get visited route', ()=> {
             const router = frontexpress.Router();
