@@ -12,7 +12,7 @@
   "author": "Camel Aissani <camel.aissani@gmail.com> (https://nuageprive.fr)",
   "license": "MIT",
   "engines": {
-    "node": ">=0.10.0"
+    "node": ">=4.2.6"
   },
   "repository": "camelaissani/frontexpress",
   "keywords": [
