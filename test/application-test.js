@@ -114,6 +114,7 @@ describe('Application', () => {
             const app = frontexpress();
             app.set('http requester', requester);
             assert(app.get('http requester') === requester);
+            assert(app.set('http requester') === requester);
         });
 
         it('bad core setting', () => {
