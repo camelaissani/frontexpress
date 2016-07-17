@@ -1,6 +1,7 @@
 /*eslint-env mocha*/
 import chai, {assert} from 'chai';
 import sinon from 'sinon';
+//import jsdom from 'jsdom';
 import frontexpress from '../lib/frontexpress';
 import Requester from '../lib/requester';
 
@@ -25,18 +26,108 @@ describe('Application', () => {
         });
     });
 
-    describe('listen method', () => {
-        let eventFn = {};
+    // // JSDOM cannot manage pushState/onpopstate/window.location
+    // see https://github.com/tmpvar/jsdom/issues/1565
+    //
+    // describe('listen method with JSDOM', () => {
+    //     before(() => {
+    //         // Init DOM with a fake document
+    //         // <base> and uri (initial uri) allow to do pushState in jsdom
+    //         jsdom.env({
+    //             html:`
+    //                 <html>
+    //                     <head>
+    //                         <base href="http://localhost:8080/"></base>
+    //                     </head>
+    //                 </html>
+    //             `,
+    //             url: 'http://localhost:8080/',
+    //             done(err, window) {
+    //                 global.window = window;
+    //                 global.document = window.document;
+    //                 window.console = global.console;
+    //             }
+    //         });
+    //     });
 
+    //     let requester;
+    //     beforeEach(()=>{
+    //         requester = new Requester();
+    //         sinon.stub(requester, 'fetch', ({uri, method, headers, data}, resolve, reject) => {
+    //             resolve(
+    //                 {uri, method, headers, data},
+    //                 {status: 200, statusText: 'OK', responseText:''}
+    //             );
+    //         });
+    //     });
+
+    //     it('history management without state object', (done) => {
+    //         const spy_pushState = sinon.spy(window.history, 'pushState');
+
+    //         const app = frontexpress();
+    //         const m = frontexpress.Middleware();
+    //         const spy_middleware = sinon.stub(m, 'updated');
+
+    //         app.set('http requester', requester);
+    //         app.use('/api/route1', m);
+    //         app.listen();
+
+    //         const spy_onpopstate = sinon.spy(window, 'onpopstate');
+
+    //         app.httpGet({uri:'/api/route1', history: {
+    //             uri: '/route1',
+    //             title: 'route1'
+    //         }},
+    //         (req, res) => {
+    //             // On request succeeded
+    //             assert(spy_onpopstate.callCount === 0);
+    //             assert(spy_pushState.calledOnce);
+    //             assert(spy_middleware.calledOnce);
+
+    //             spy_middleware.reset();
+    //             window.history.back();
+    //             window.history.forward();
+    //             assert(spy_onpopstate.calledOnce);
+    //             assert(spy_middleware.calledOnce);
+
+    //             done();
+    //         });
+    //     });
+    // });
+
+    describe('listen method', () => {
+        // Here I cannot use jsdon to make these tests :(
+        // JSDOM cannot simulate readyState changes
         beforeEach(() => {
+            const browserHistory = [{uri: '/'}];
+            let browserHistoryIndex = 0;
+
             global.document = {};
             global.window = {
-                addEventListener(eventType, callback) {
-                    eventFn[eventType] = callback;
-                },
                 location: {
                     pathname: '/route1',
                     search: '?a=b'
+                },
+                history: {
+                    pushState(state, title, pathname) {
+                        browserHistory.push({uri: pathname, state});
+                        browserHistoryIndex++;
+                        global.window.location.pathname = browserHistory[browserHistoryIndex].uri;
+                    },
+                    forward() {
+                        browserHistoryIndex++;
+                        global.window.location.pathname = browserHistory[browserHistoryIndex].uri;
+                        if (browserHistory[browserHistoryIndex].state) {
+                            window.onpopstate({state:browserHistory[browserHistoryIndex].state});
+                        }
+                    },
+                    back() {
+                        browserHistoryIndex--;
+                        global.window.location.pathname = browserHistory[browserHistoryIndex].uri;
+                        if (browserHistory[browserHistoryIndex].state) {
+                            window.onpopstate({state: browserHistory[browserHistoryIndex].state});
+                        }
+                    }
                 }
             };
         });
@@ -93,12 +184,101 @@ describe('Application', () => {
             app.use('/route1', m);
             app.listen(() => {
                 //simulate beforeunload
-                eventFn['beforeunload']();
+                window.onbeforeunload();
             });
 
             //simulate readystatechange
             document.readyState = 'interactive';
             document.onreadystatechange();
+        });
+
+        it('history management without state object', (done) => {
+            const requester = new Requester();
+            sinon.stub(requester, 'fetch', ({uri, method, headers, data}, resolve, reject) => {
+                resolve(
+                    {uri, method, headers, data},
+                    {status: 200, statusText: 'OK', responseText:''}
+                );
+            });
+
+            const spy_pushState = sinon.spy(window.history, 'pushState');
+
+            const app = frontexpress();
+            const m = frontexpress.Middleware();
+            const spy_middleware = sinon.stub(m, 'updated');
+
+            app.set('http requester', requester);
+            app.use('/api/route1', m);
+            app.listen();
+
+            const spy_onpopstate = sinon.spy(window, 'onpopstate');
+
+            app.httpGet({uri:'/api/route1', history: {
+                uri: '/route1',
+                title: 'route1'
+            }},
+            (req, res) => {
+                // On request succeeded
+                assert(spy_onpopstate.callCount === 0);
+                assert(spy_pushState.calledOnce);
+                assert(spy_middleware.calledOnce);
+
+                spy_middleware.reset();
+                window.history.back();
+                window.history.forward();
+                assert(spy_onpopstate.calledOnce);
+                assert(spy_middleware.calledOnce);
+
+                done();
+            });
+        });
+
+        it('history management with state object', (done) => {
+            let stateObj;
+            const requester = new Requester();
+            sinon.stub(requester, 'fetch', ({uri, method, headers, data}, resolve, reject) => {
+                resolve(
+                    {uri, method, headers, data},
+                    {status: 200, statusText: 'OK', responseText:''}
+                );
+            });
+
+            const spy_pushState = sinon.spy(window.history, 'pushState');
+
+            const app = frontexpress();
+            const m = frontexpress.Middleware();
+            const spy_middleware = sinon.stub(m, 'updated', (req, res) => {
+                stateObj = res.historyState;
+            });
+
+            app.set('http requester', requester);
+            app.use('/api/route1', m);
+            app.listen();
+
+            const spy_onpopstate = sinon.spy(window, 'onpopstate');
+
+            app.httpGet({uri:'/api/route1', history: {
+                uri: '/route1',
+                title: 'route1',
+                state: {a: 'b', c: 'd'}
+            }},
+            (req, res) => {
+                // On request succeeded
+                assert(spy_onpopstate.callCount === 0);
+                assert(spy_pushState.calledOnce);
+                assert(spy_middleware.calledOnce);
+
+                spy_middleware.reset();
+                window.history.back();
+                window.history.forward();
+                assert(spy_onpopstate.calledOnce);
+                assert(spy_middleware.calledOnce);
+                assert(stateObj);
+                assert(stateObj.a === 'b');
+                assert(stateObj.c === 'd');
+
+                done();
+            });
         });
     });
 
