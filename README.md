@@ -11,7 +11,7 @@
 import frontexpress from 'frontexpress';
 const app = frontexpress();
 
-// listen HTTP GET request on path (/)
+// listen HTTP GET request on path (/hello)
 app.get('/hello', (req, res) => {
   document.querySelector('.content').innerHTML = '<p>Hello World</p>';
 });
