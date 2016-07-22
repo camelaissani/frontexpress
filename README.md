@@ -177,6 +177,43 @@ app.use('/birds', birds);
 
 The app will now be able to react on requests (/birds) and (/birds/about)
 
+## API
+
+| Class         | Method        |
+| ------------- | --------------|
+|Frontexpress   ||
+||[frontexpress()](https://github.com/camelaissani/frontexpress/blob/master/docs/frontexpress.md#frontexpress-1)|
+||[frontexpress.Router](https://github.com/camelaissani/frontexpress/blob/master/docs/frontexpress.md#frontexpressrouter)|
+||[frontexpress.Middleware](https://github.com/camelaissani/frontexpress/blob/master/docs/frontexpress.md#frontexpressmiddleware)|
+|||
+| Application   ||
+||[set(setting, value)](https://github.com/camelaissani/frontexpress/blob/master/docs/application.md#applicationsetsetting-val) |
+||[listen(callback)](https://github.com/camelaissani/frontexpress/blob/master/docs/application.md#applicationlistencallback) |
+||[route(uri)](https://github.com/camelaissani/frontexpress/blob/master/docs/application.md#applicationrouteuri) |
+||[use(uri, middleware)](https://github.com/camelaissani/frontexpress/blob/master/docs/application.md#applicationuseuri-middleware) |
+|| get(uri, middleware) |
+|| post(uri, middleware) |
+|| put(uri, middleware) |
+|| delete(uri, middleware) |
+|| httpGet(request, success, failure) |
+|| httpPost(request, success, failure) |
+|| httpPut(request, success, failure) |
+|| httpDelete(request, success, failure) |
+|||
+| Router        ||
+||[use(middleware)](https://github.com/camelaissani/frontexpress/blob/master/docs/router.md#routerusemiddleware) |
+||[all(middleware)](https://github.com/camelaissani/frontexpress/blob/master/docs/router.md#routerallmiddleware) |
+|| get(uri, middleware) |
+|| post(uri, middleware) |
+|| put(uri, middleware) |
+|| delete(uri, middleware) |
+|||
+| Middleware    ||
+||[entered(request)](https://github.com/camelaissani/frontexpress/blob/master/docs/middleware.md#middlewareenteredrequest) |
+||[exited(request)](https://github.com/camelaissani/frontexpress/blob/master/docs/middleware.md#middlewareexitedrequest) |
+||[updated(request, response)](https://github.com/camelaissani/frontexpress/blob/master/docs/middleware.md#middlewareupdatedrequest-response) |
+||[failed(request, response)](https://github.com/camelaissani/frontexpress/blob/master/docs/middleware.md#middlewarefailedrequest-response) |
+||[next()](https://github.com/camelaissani/frontexpress/blob/master/docs/middleware.md#middlewarenext) |
 ## License
 
  [MIT](LICENSE)
