@@ -8,7 +8,7 @@ Create a frontexpress application.
 **Returns**: `Application`, the application
 
 
-## frontexpress.Router 
+## frontexpress.Router() 
 
 Expose the Router constructor
 
