@@ -183,8 +183,8 @@ The app will now be able to react on requests (/birds) and (/birds/about)
 | ------------- | --------------|
 |Frontexpress   ||
 ||[frontexpress()](https://github.com/camelaissani/frontexpress/blob/master/docs/frontexpress.md#frontexpress-1)|
-||[frontexpress.Router](https://github.com/camelaissani/frontexpress/blob/master/docs/frontexpress.md#frontexpressrouter)|
-||[frontexpress.Middleware](https://github.com/camelaissani/frontexpress/blob/master/docs/frontexpress.md#frontexpressmiddleware)|
+||[frontexpress.Router()](https://github.com/camelaissani/frontexpress/blob/master/docs/frontexpress.md#frontexpressrouter)|
+||[frontexpress.Middleware()](https://github.com/camelaissani/frontexpress/blob/master/docs/frontexpress.md#frontexpressmiddleware)|
 |||
 | Application   ||
 ||[set(setting, value)](https://github.com/camelaissani/frontexpress/blob/master/docs/application.md#applicationsetsetting-val) |
