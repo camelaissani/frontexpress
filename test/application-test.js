@@ -193,10 +193,11 @@ describe('Application', () => {
         });
 
         it('history management without state object', (done) => {
+            let historyObj;
             const requester = new Requester();
-            sinon.stub(requester, 'fetch', ({uri, method, headers, data}, resolve, reject) => {
+            sinon.stub(requester, 'fetch', ({uri, method, headers, data, history}, resolve, reject) => {
                 resolve(
-                    {uri, method, headers, data},
+                    {uri, method, headers, data, history},
                     {status: 200, statusText: 'OK', responseText:''}
                 );
             });
@@ -205,7 +206,9 @@ describe('Application', () => {
 
             const app = frontexpress();
             const m = frontexpress.Middleware();
-            const spy_middleware = sinon.stub(m, 'updated');
+            const spy_middleware = sinon.stub(m, 'updated', (req, res) => {
+                historyObj = req.history;
+            });
 
             app.set('http requester', requester);
             app.use('/api/route1', m);
@@ -228,17 +231,20 @@ describe('Application', () => {
                 window.history.forward();
                 assert(spy_onpopstate.calledOnce);
                 assert(spy_middleware.calledOnce);
+                assert(historyObj);
+                assert(historyObj.uri === '/route1');
+                assert(historyObj.title === 'route1');
 
                 done();
             });
         });
 
         it('history management with state object', (done) => {
-            let stateObj;
+            let historyObj;
             const requester = new Requester();
-            sinon.stub(requester, 'fetch', ({uri, method, headers, data}, resolve, reject) => {
+            sinon.stub(requester, 'fetch', ({uri, method, headers, data, history}, resolve, reject) => {
                 resolve(
-                    {uri, method, headers, data},
+                    {uri, method, headers, data, history},
                     {status: 200, statusText: 'OK', responseText:''}
                 );
             });
@@ -248,7 +254,7 @@ describe('Application', () => {
             const app = frontexpress();
             const m = frontexpress.Middleware();
             const spy_middleware = sinon.stub(m, 'updated', (req, res) => {
-                stateObj = res.historyState;
+                historyObj = req.history;
             });
 
             app.set('http requester', requester);
@@ -273,9 +279,12 @@ describe('Application', () => {
                 window.history.forward();
                 assert(spy_onpopstate.calledOnce);
                 assert(spy_middleware.calledOnce);
-                assert(stateObj);
-                assert(stateObj.a === 'b');
-                assert(stateObj.c === 'd');
+                assert(historyObj);
+                assert(historyObj.uri === '/route1');
+                assert(historyObj.title === 'route1');
+                assert(historyObj.state);
+                assert(historyObj.state.a === 'b');
+                assert(historyObj.state.c === 'd');
 
                 done();
             });
