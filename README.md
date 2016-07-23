@@ -59,7 +59,7 @@ $ npm test
 ### Disclaimer
 
 >
-> In this first version of frontexpress, the API is not completely the miror of the expressjs one.
+> In this first version of frontexpress, the API is not completely the mirror of the expressjs one.
 >
 > There are some missing methods. Currently, the use, get, post... methods having a middlewares array as parameter are not available.
 > The string pattern to define route paths is not yet implemented.
