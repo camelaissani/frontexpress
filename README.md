@@ -7,24 +7,60 @@
  [![Coverage Status](https://coveralls.io/repos/github/camelaissani/frontexpress/badge.svg?branch=master)](https://coveralls.io/github/camelaissani/frontexpress?branch=master)
  ![Coverage Status](https://david-dm.org/camelaissani/frontexpress.svg)
 
+Let's assume having this html page:
+
+```html
+<html>
+    <body>
+        <button type="button" data-url="http://httpbin.org/get?page=Page1">Page 1</button>
+        <button type="button" data-url="http://httpbin.org/get?page=Page2">Page 2</button>
+        <button type="button" data-url="http://httpbin.org/get?page=Page3">Page 3</button>
+        <button type="button" data-url="http://httpbin.org/status/401">Restricted area</button>
+
+        <div class="content"></div>
+    </body>
+</html>
+```
+
+Here the code managing routes front-end side:
+
 ```js
 import frontexpress from 'frontexpress';
+
+// Frontend application
 const app = frontexpress();
 
-// listen HTTP GET request on path (/hello)
-app.get('/hello', (req, res) => {
-  document.querySelector('.content').innerHTML = '<p>Hello World</p>';
+// listen HTTP 401 error
+// display an alert on 401 UNAUTHORIZED
+app.use((req, res, next) => {
+    if (res.status === 401) {
+        window.alert('Restricted area!!!');
+    } else {
+        next();
+    }
 });
 
-// listen HTTP GET request on API (/api/xxx)
-// update page content with response
-app.get(/^\/api\//, (req, res, next) => {
-  document.querySelector('.content').innerHTML = res.responseText;
-  next();
+// listen HTTP GET requests from http://httpbin.org/get
+// update html page with response content
+app.get('http://httpbin.org/get', (req, res, next) => {
+    const obj = JSON.parse(res.responseText);
+    document.querySelector('.content').innerHTML = `<h1>${obj.args.page}</h1>`;
+    next();
 });
 
 // start listening frontend application requests
-app.listen();
+app.listen(() => {
+    // Register website buttons
+    const buttons = document.querySelectorAll('button');
+    for (let i=0; i<buttons.length; i++) {
+        const button = buttons[i];
+        const url = button.dataset.url;
+        button.addEventListener('click', () => {
+            // make an ajax call
+            app.httpGet(url);
+        });
+    }
+});
 ```
 
 ## Installation
