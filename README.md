@@ -53,7 +53,10 @@ $ npm install
 $ npm test
 ```
 
-## Disclaimer
+
+## Routing samples
+
+### Disclaimer
 
 >
 > In this first version of frontexpress, the API is not completely the miror of the expressjs one.
@@ -63,8 +66,6 @@ $ npm test
 >
 > Obviously, the objective is to have the same API as expressjs when the methods make sense browser side.
 >
-
-## Routing
 
 ### Basic routing
 
