@@ -1,6 +1,6 @@
 # Middleware
 
-## Middleware.entered(request) 
+## Middleware.entered(request)
 
 Invoked by the app before ajax request are sent or
 during the DOM loading (document.readyState === 'loading').
@@ -10,10 +10,10 @@ Override this method to add your custom behaviour
 
 **Parameters**
 
-**request**: `Object`
+  **request**: `Object`
 
 
-## Middleware.exited(request) 
+## Middleware.exited(request)
 
 Invoked by the app before a new ajax request is sent or before the DOM unloading.
 See Application#_callMiddlewareExited documentation for details.
@@ -22,10 +22,10 @@ Override this method to add your custom behaviour
 
 **Parameters**
 
-**request**: `Object`
+  **request**: `Object`
 
 
-## Middleware.updated(request, response) 
+## Middleware.updated(request, response)
 
 Invoked on ajax request responding or on DOM ready
 (document.readyState === 'interactive').
@@ -35,12 +35,12 @@ Override this method to add your custom behaviour
 
 **Parameters**
 
-**request**: `Object`
+  **request**: `Object`
 
-**response**: `Object`
+  **response**: `Object`
 
 
-## Middleware.failed(request, response) 
+## Middleware.failed(request, response)
 
 Invoked when ajax request fails.
 
@@ -48,12 +48,12 @@ Override this method to add your custom behaviour
 
 **Parameters**
 
-**request**: `Object`
+  **request**: `Object`
 
-**response**: `Object`
+  **response**: `Object`
 
 
-## Middleware.next() 
+## Middleware.next()
 
 Allow the hand over to the next middleware object or function.
 
