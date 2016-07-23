@@ -179,7 +179,7 @@ The app will now be able to react on requests (/birds) and (/birds/about)
 
 ## API
 
-| Class         | Method        | Short description |
+|               | Method        | Short description |
 | ------------- | --------------| ----------------- |
 |Frontexpress |||
 ||[frontexpress()](https://github.com/camelaissani/frontexpress/blob/master/docs/frontexpress.md#frontexpress-1)|Creates an instance of application|
@@ -221,11 +221,73 @@ The app will now be able to react on requests (/birds) and (/birds/about)
 
 ### middleware function
 
+After registering a middleware function, the application invokes it with these parameters:
+
+```js
+  (request, response, next) => {
+    next();
+  }
+```
+
+**request**: `Object`, the ajax request information sent by the app
+
+**response**: `Object`, the response of request
+
+**next**: `Function`, the `next()` function to call to not break the middleware execution chain
+
 
 ### request object
 
+```js
+  {
+    method,
+    uri,
+    headers,
+    data,
+    history: {
+      state,
+      title,
+      uri
+    }
+  }
+```
+
+**method**: `String`, HTTP methods 'GET', 'POST'...
+
+**uri**: `String`, path
+
+**headers**: `Object`, custom HTTP headers
+
+**data**: `Object`, data attached to the request
+
+**history**: `Object`, object with properties state, title and uri
+
+**If the history object is set, it will activate the browser history management.** See [browser pushState() method](https://developer.mozilla.org/en-US/docs/Web/API/History_API#The_pushState()_method) for more information about state, title, and uri (url).
+
+> uri and history.uri can be different.
+
 
 ### response object
+
+```js
+  {
+    status,
+    statusText,
+    responseText,
+    errorThrown,
+    errors
+  }
+```
+
+**status**: `Number`, HTTP status 200, 404, 401, 500...
+
+**statusText**: `String`
+
+**responseText**: `String` response content
+
+**errorThrown**: `Object` exception thrown (if request fails)
+
+**errors**: `String` error description (if request fails)
 
 
 ## License
