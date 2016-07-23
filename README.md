@@ -192,24 +192,24 @@ The app will now be able to react on requests (/birds) and (/birds/about)
 ||[route(uri)](https://github.com/camelaissani/frontexpress/blob/master/docs/application.md#applicationrouteuri)|Gets a Router initialized with a root path|
 ||[use(uri, middleware)](https://github.com/camelaissani/frontexpress/blob/master/docs/application.md#applicationuseuri-middleware)|Sets a middleware|
 ||||
-||get(uri, middleware)|Applies a middleware on given path for a GET request|
-||post(uri, middleware)|Applies a middleware on given path for a POST request|
-||put(uri, middleware)|Applies a middleware on given path for a PUT request|
-||delete(uri, middleware)|Applies a middleware on given path for a DELETE request|
+||[get(uri, middleware)](https://github.com/camelaissani/frontexpress/blob/master/docs/application.md#applicationgeturi-middleware-applicationposturi-middleware)|Applies a middleware on given path for a GET request|
+||[post(uri, middleware)](https://github.com/camelaissani/frontexpress/blob/master/docs/application.md#applicationgeturi-middleware-applicationposturi-middleware)|Applies a middleware on given path for a POST request|
+||[put(uri, middleware)](https://github.com/camelaissani/frontexpress/blob/master/docs/application.md#applicationgeturi-middleware-applicationposturi-middleware)|Applies a middleware on given path for a PUT request|
+||[delete(uri, middleware)](https://github.com/camelaissani/frontexpress/blob/master/docs/application.md#applicationgeturi-middleware-applicationposturi-middleware)|Applies a middleware on given path for a DELETE request|
 ||||
-||httpGet(request, success, failure)|Invokes a GET ajax request|
-||httpPost(request, success, failure)|Invokes a POST ajax request|
-||httpPut(request, success, failure)|Invokes a PUT ajax request|
-||httpDelete(request, success, failure)|Invokes a DELETE ajax request|
+||[httpGet(request, success, failure)](https://github.com/camelaissani/frontexpress/blob/master/docs/application.md#applicationhttpgetrequest-success-failure-applicationhttppostrequest-success-failure)|Invokes a GET ajax request|
+||[httpPost(request, success, failure)](https://github.com/camelaissani/frontexpress/blob/master/docs/application.md#applicationhttpgetrequest-success-failure-applicationhttppostrequest-success-failure)|Invokes a POST ajax request|
+||[httpPut(request, success, failure)](https://github.com/camelaissani/frontexpress/blob/master/docs/application.md#applicationhttpgetrequest-success-failure-applicationhttppostrequest-success-failure)|Invokes a PUT ajax request|
+||[httpDelete(request, success, failure)](https://github.com/camelaissani/frontexpress/blob/master/docs/application.md#applicationhttpgetrequest-success-failure-applicationhttppostrequest-success-failure)|Invokes a DELETE ajax request|
 ||||
 |Router |||
 ||[use(middleware)](https://github.com/camelaissani/frontexpress/blob/master/docs/router.md#routerusemiddleware)|Sets a middleware|
 ||[all(middleware)](https://github.com/camelaissani/frontexpress/blob/master/docs/router.md#routerallmiddleware)|Sets a middleware on all HTTP method requests|
 ||||
-||get(uri, middleware)|Applies a middleware on given path for a GET request|
-||post(uri, middleware)|Applies a middleware on given path for a POST request|
-||put(uri, middleware)|Applies a middleware on given path for a PUT request|
-||delete(uri, middleware)|Applies a middleware on given path for a DELETE request|
+||[get(uri, middleware)](https://github.com/camelaissani/frontexpress/blob/master/docs/router.md#routergeturi-middleware-routerposturi-middleware)|Applies a middleware on given path for a GET request|
+||[post(uri, middleware)](https://github.com/camelaissani/frontexpress/blob/master/docs/router.md#routergeturi-middleware-routerposturi-middleware)|Applies a middleware on given path for a POST request|
+||[put(uri, middleware)](https://github.com/camelaissani/frontexpress/blob/master/docs/router.md#routergeturi-middleware-routerposturi-middleware)|Applies a middleware on given path for a PUT request|
+||[delete(uri, middleware)](https://github.com/camelaissani/frontexpress/blob/master/docs/router.md#routergeturi-middleware-routerposturi-middleware)|Applies a middleware on given path for a DELETE request|
 ||||
 |Middleware |||
 ||[entered(request)](https://github.com/camelaissani/frontexpress/blob/master/docs/middleware.md#middlewareenteredrequest)|Invoked by the app before an ajax request is sent|
@@ -217,12 +217,16 @@ The app will now be able to react on requests (/birds) and (/birds/about)
 ||[updated(request, response)](https://github.com/camelaissani/frontexpress/blob/master/docs/middleware.md#middlewareupdatedrequest-response)|Invoked by the app after an ajax request has responded|
 ||[failed(request, response)](https://github.com/camelaissani/frontexpress/blob/master/docs/middleware.md#middlewarefailedrequest-response)|Invoked by the app after an ajax request has failed|
 ||[next()](https://github.com/camelaissani/frontexpress/blob/master/docs/middleware.md#middlewarenext)|Allows to break the middleware chain execution|
-||||
-|middleware function |||
-||||
-|request object |||
-||||
-|response object |||
+
+
+### middleware function
+
+
+### request object
+
+
+### response object
+
 
 ## License
 

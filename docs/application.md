@@ -126,9 +126,8 @@ Samples above can be applied on other HTTP methods.
 
 **Parameters**
 
-      **request**: `String | Object` uri or object containing uri, http headers, data, history
+  **request**: `String | Object` uri or object containing uri, http headers, data, history
 
-      **success**: `Function` success callback
+  **success**: `Function` success callback
 
-      **failure**: `Function` failure callback
-
+  **failure**: `Function` failure callback
