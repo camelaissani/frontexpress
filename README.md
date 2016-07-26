@@ -21,7 +21,7 @@ Let's assume having this html page:
 </html>
 ```
 
-Now, listen user/browser navigation and manage frontend workflows with **frontexpress**:
+Now, listen user/browser navigation and manage paths with **frontexpress**:
 
 ```js
 import frontexpress from 'frontexpress';
