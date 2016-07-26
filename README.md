@@ -1,6 +1,6 @@
 ![frontexpress](http://fontmeme.com/embed.php?text=frontexpress&name=Atype%201%20Light.ttf&size=90&style_color=6F6F75)
 
- Minimalist front end router framework à la [express](http://expressjs.com/)
+ Framework for managing browser navigation with the same API as [express](http://expressjs.com/)
 
  [![Build Status](https://travis-ci.org/camelaissani/frontexpress.svg?branch=master)](https://travis-ci.org/camelaissani/frontexpress)
  [![Code Climate](https://codeclimate.com/github/camelaissani/frontexpress/badges/gpa.svg)](https://codeclimate.com/github/camelaissani/frontexpress)
@@ -12,17 +12,16 @@ Let's assume having this html page:
 ```html
 <html>
     <body>
-        <button type="button" data-url="http://httpbin.org/get?page=Page1">Page 1</button>
-        <button type="button" data-url="http://httpbin.org/get?page=Page2">Page 2</button>
-        <button type="button" data-url="http://httpbin.org/get?page=Page3">Page 3</button>
-        <button type="button" data-url="http://httpbin.org/status/401">Restricted area</button>
+        <button id="b1" type="button">Page 1</button>
+        <button id="b2" type="button">Page 2</button>
+        <button id="b3" type="button">Restricted area</button>
 
         <div class="content"></div>
     </body>
 </html>
 ```
 
-Here the code managing routes front-end side:
+Now, listen user/browser navigation and manage frontend workflows with **frontexpress**:
 
 ```js
 import frontexpress from 'frontexpress';
@@ -30,8 +29,9 @@ import frontexpress from 'frontexpress';
 // Frontend application
 const app = frontexpress();
 
-// listen HTTP 401 error
-// display an alert on 401 UNAUTHORIZED
+// navigation raising an HTTP 401
+
+// display an alert
 app.use((req, res, next) => {
     if (res.status === 401) {
         window.alert('Restricted area!!!');
@@ -40,26 +40,35 @@ app.use((req, res, next) => {
     }
 });
 
-// listen HTTP GET requests from http://httpbin.org/get
-// update html page with response content
-app.get('http://httpbin.org/get', (req, res, next) => {
-    const obj = JSON.parse(res.responseText);
-    document.querySelector('.content').innerHTML = `<h1>${obj.args.page}</h1>`;
-    next();
+// navigation on path /pages
+// update the 'content' div
+app.get('/pages', (req, res) => {
+    document.querySelector('.content').innerHTML = `<h1>${res.responseText}</h1>`;
 });
 
-// start listening frontend application requests
+// start frontend application
 app.listen(() => {
-    // Register website buttons
-    const buttons = document.querySelectorAll('button');
-    for (let i=0; i<buttons.length; i++) {
-        const button = buttons[i];
-        const url = button.dataset.url;
-        button.addEventListener('click', () => {
-            // make an ajax call
-            app.httpGet(url);
-        });
-    }
+    // on DOM ready
+    // initiate buttons management
+
+    // button b1
+    document.querySelector('#b1').addEventListener('click', () => {
+        // make an ajax request to get page1 content from backend
+        app.httpGet('/pages/page1');
+    });
+
+    // button b2
+    document.querySelector('#b2').addEventListener('click', () => {
+        // make an ajax request to get page2 content from backend
+        app.httpGet('/pages/page2');
+    });
+
+    // button b3
+    document.querySelector('#b3').addEventListener('click', () => {
+        // make an ajax request to get restricted page content from backend
+        app.httpGet('/pages/restricted');
+    });
+
 });
 ```
 
@@ -90,14 +99,14 @@ $ npm test
 ```
 
 
-## Routing samples
+## Navigation path and frontexpress routing
 
 ### Disclaimer
 
 >
 > In this first version of frontexpress, the API is not completely the mirror of the expressjs one.
 >
-> There are some missing methods. Currently, the use, get, post... methods having a middlewares array as parameter are not available.
+> There are some missing methods. Currently, the use, get, post... methods having a middleware array as parameter are not available.
 > The string pattern to define route paths is not yet implemented.
 >
 > Obviously, the objective is to have the same API as expressjs when the methods make sense browser side.
@@ -105,33 +114,25 @@ $ npm test
 
 ### Basic routing
 
-Routing allows to link the frontend application with HTTP requests to a particular URI (or path).
-The link can be specific to an HTTP request method (GET, POST, and so on).
-
-The following examples illustrate how to define simple routes.
-
-Listen an HTTP GET request on URI (/):
+Listen navigation (GET request) on path /hello:
 
 ```js
-app.get('/', (req, res) => {
+app.get('/hello', (req, res) => {
   window.alert('Hello World');
 });
 ```
 
-Listen an HTTP POST request on URI (/):
+Listen a POST request on path /item:
 
 ```js
-app.post('/', (req, res) => {
-  window.alert('Got a POST request at /');
+app.post('/item', (req, res) => {
+  window.alert('Got a POST request at /item');
 });
 ```
 
-### Route paths
+### Routing based on RegExp
 
-Route paths, in combination with a request method, define the endpoints at which requests can be made.
-Route paths can be strings (see basic routing section), or regular expressions.
-
-This route path matches all GET request paths which start with (/api/):
+Listen navigation on paths which start with /api/:
 
 ```js
 app.get(/^api\//, (req, res) => {
@@ -139,10 +140,10 @@ app.get(/^api\//, (req, res) => {
 });
 ```
 
-### Route handlers
+### Chain handlers
 
-You can provide multiple callback functions to handle a request. Invoking ```next()``` function allows to pass the control to subsequent routes.
-Whether ```next()``` method is not called the handler chain is stoped
+You can provide multiple handlers functions on a navigation path. Invoking ```next()``` function allows to chain the handlers.
+At the opposite, when the ```next()``` method is not called the handler chain is stopped.
 
 ```js
 const h1 = (req, res, next) => { console.log('h1!'); next(); };
@@ -154,7 +155,7 @@ app.get('/example/a', h2);
 app.get('/example/a', h3);
 ```
 
-A response to a GET request on path (/example/a) displays:
+On navigation on path /example/a, the browser console displays the following:
 
 ```
 h1!
@@ -178,25 +179,25 @@ app.route('/book')
 
 Use the ```frontexpress.Router``` class to create modular, mountable route handlers.
 
-Create a router file named ```birds.js``` in the app directory, with the following content:
+Create a router file named ```birds.js```:
 
 ```js
 import frontexpress from 'frontexpress';
 
 const router = frontexpress.Router();
 
-// middleware that is specific to this router
+// specific middleware for this router
 router.use((req, res, next) => {
   console.log(`Time: ${Date.now()}`);
   next();
 });
 
-// react on home page route
+// listen navigation on the home page
 router.get('/', (req, res) => {
   document.querySelector('.content').innerHTML = '<p>Birds home page</p>';
 });
 
-// react on about route
+// listen navigation on the about page
 router.get('/about', (req, res) => {
   document.querySelector('.content').innerHTML = '<p>About birds</p>';
 });
@@ -212,12 +213,10 @@ import birds  from './birds';
 app.use('/birds', birds);
 ```
 
-The app will now be able to react on requests (/birds) and (/birds/about)
-
 ## API
 
 |               | Method        | Short description |
-| ------------- | --------------| ----------------- |
+| :------------- | :--------------| :----------------- |
 |Frontexpress |||
 ||[frontexpress()](https://github.com/camelaissani/frontexpress/blob/master/docs/frontexpress.md#frontexpress-1)|Creates an instance of application|
 ||[frontexpress.Router()](https://github.com/camelaissani/frontexpress/blob/master/docs/frontexpress.md#frontexpressrouter)|Creates a Router object|
@@ -273,7 +272,7 @@ After registering a middleware function, the application invokes it with these p
 **next**: `Function`, the `next()` function to call to not break the middleware execution chain
 
 
-### request object
+### request object
 
 ```js
   {
@@ -330,3 +329,5 @@ After registering a middleware function, the application invokes it with these p
 ## License
 
  [MIT](LICENSE)
+
+ 
