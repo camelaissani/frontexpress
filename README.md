@@ -30,7 +30,6 @@ import frontexpress from 'frontexpress';
 const app = frontexpress();
 
 // navigation raising an HTTP 401
-
 // display an alert
 app.use((req, res, next) => {
     if (res.status === 401) {
@@ -68,7 +67,6 @@ app.listen(() => {
         // make an ajax request to get restricted page content from backend
         app.httpGet('/pages/restricted');
     });
-
 });
 ```
 
