@@ -1,6 +1,6 @@
 ![frontexpress](http://fontmeme.com/embed.php?text=frontexpress&name=Atype%201%20Light.ttf&size=90&style_color=6F6F75)
 
- Framework for managing the navigation in the browser with the same API as [express](http://expressjs.com/)
+ Framework for managing the navigation in the browser with the same API as [expressjs](http://expressjs.com/)
 
  [![Build Status](https://travis-ci.org/camelaissani/frontexpress.svg?branch=master)](https://travis-ci.org/camelaissani/frontexpress)
  [![Code Climate](https://codeclimate.com/github/camelaissani/frontexpress/badges/gpa.svg)](https://codeclimate.com/github/camelaissani/frontexpress)
