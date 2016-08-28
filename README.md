@@ -1,72 +1,33 @@
 ![frontexpress](http://fontmeme.com/embed.php?text=frontexpress&name=Atype%201%20Light.ttf&size=90&style_color=6F6F75)
 
- Framework for managing the navigation in the browser with the same API as [expressjs](http://expressjs.com/)
+ Framework for managing front-end routes with the same API as [expressjs](http://expressjs.com/)
 
  [![Build Status](https://travis-ci.org/camelaissani/frontexpress.svg?branch=master)](https://travis-ci.org/camelaissani/frontexpress)
  [![Code Climate](https://codeclimate.com/github/camelaissani/frontexpress/badges/gpa.svg)](https://codeclimate.com/github/camelaissani/frontexpress)
  [![Coverage Status](https://coveralls.io/repos/github/camelaissani/frontexpress/badge.svg?branch=master)](https://coveralls.io/github/camelaissani/frontexpress?branch=master)
  ![Coverage Status](https://david-dm.org/camelaissani/frontexpress.svg)
 
-Let's assume having this html page:
-
-```html
-<html>
-    <body>
-        <button id="b1" type="button">Page 1</button>
-        <button id="b2" type="button">Page 2</button>
-        <button id="b3" type="button">Restricted area</button>
-
-        <div class="content"></div>
-    </body>
-</html>
-```
-
-Now, listen user/browser navigation and manage paths with **frontexpress**:
+Listen user/browser navigation and manage front-end routes with **frontexpress**:
 
 ```js
 import frontexpress from 'frontexpress';
 
-// Frontend application
+// Front-end application
 const app = frontexpress();
 
-// navigation raising an HTTP 401
-// display an alert
-app.use((req, res, next) => {
-    if (res.status === 401) {
-        window.alert('Restricted area!!!');
-    } else {
-        next();
-    }
+// navigation on path /page1
+app.get('/page1', (req, res) => {
+    document.querySelector('.content').innerHTML = `<h1>Page 1 content</h1>`;
 });
 
-// navigation on path /pages
-// update the 'content' div
-app.get('/pages', (req, res) => {
-    document.querySelector('.content').innerHTML = `<h1>${res.responseText}</h1>`;
+// navigation on path /page2
+app.get('/page2', (req, res) => {
+    document.querySelector('.content').innerHTML = `<h1>Page 2 content</h1>`;
 });
 
-// start frontend application
+// start front-end application
 app.listen(() => {
     // on DOM ready
-    // initiate buttons management
-
-    // button b1
-    document.querySelector('#b1').addEventListener('click', () => {
-        // make an ajax request to get page1 content from backend
-        app.httpGet('/pages/page1');
-    });
-
-    // button b2
-    document.querySelector('#b2').addEventListener('click', () => {
-        // make an ajax request to get page2 content from backend
-        app.httpGet('/pages/page2');
-    });
-
-    // button b3
-    document.querySelector('#b3').addEventListener('click', () => {
-        // make an ajax request to get restricted page content from backend
-        app.httpGet('/pages/restricted');
-    });
 });
 ```
 
