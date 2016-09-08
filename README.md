@@ -1,13 +1,15 @@
 ![frontexpress](http://fontmeme.com/embed.php?text=frontexpress&name=Atype%201%20Light.ttf&size=90&style_color=6F6F75)
 
- Framework for managing front-end routes with the same API as [expressjs](http://expressjs.com/)
+ Frontexpress manages routes in browser like [ExpressJS](http://expressjs.com/) does on Node.
+
+ Same language same API on all the stack.
 
  [![Build Status](https://travis-ci.org/camelaissani/frontexpress.svg?branch=master)](https://travis-ci.org/camelaissani/frontexpress)
  [![Code Climate](https://codeclimate.com/github/camelaissani/frontexpress/badges/gpa.svg)](https://codeclimate.com/github/camelaissani/frontexpress)
  [![Coverage Status](https://coveralls.io/repos/github/camelaissani/frontexpress/badge.svg?branch=master)](https://coveralls.io/github/camelaissani/frontexpress?branch=master)
  ![Coverage Status](https://david-dm.org/camelaissani/frontexpress.svg)
 
-Listen user/browser navigation and manage front-end routes with **frontexpress**:
+Code the front-end logic with the same style than on the back-end with express
 
 ```js
 import frontexpress from 'frontexpress';
@@ -289,4 +291,4 @@ After registering a middleware function, the application invokes it with these p
 
  [MIT](LICENSE)
 
- 
+

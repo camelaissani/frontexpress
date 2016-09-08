@@ -1,7 +1,7 @@
 {
   "name": "frontexpress",
-  "version": "0.1.5",
-  "description": "Minimalist front end router framework a la express",
+  "version": "0.1.6",
+  "description": "Frontexpress manages routes in browser like ExpressJS on Node",
   "main": "dist/frontexpress.js",
   "scripts": {
     "lint": "eslint .",
@@ -21,8 +21,6 @@
     "web",
     "router",
     "middleware",
-    "rest",
-    "restful",
     "app",
     "api",
     "express",
