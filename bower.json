@@ -1,0 +1,29 @@
+{
+  "name": "frontexpress",
+  "description": "Frontexpress manages routes in browser like ExpressJS on Node",
+  "main": "dist/frontexpress.js",
+  "authors": [
+    "Camel Aissani <camel.aissani@gmail.com> (https://nuageprive.fr)"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "front",
+    "framework",
+    "web",
+    "router",
+    "middleware",
+    "app",
+    "api",
+    "express",
+    "frontexpress"
+  ],
+  "homepage": "https://github.com/camelaissani/frontexpress",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "coverage"
+  ]
+}
