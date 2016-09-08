@@ -20,6 +20,8 @@
   "homepage": "https://github.com/camelaissani/frontexpress",
   "ignore": [
     "**/.*",
+    "webpack.config.js",
+    "lib",
     "node_modules",
     "bower_components",
     "test",
