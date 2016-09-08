@@ -1,0 +1,1 @@
+import frontexpress from 'expose?frontexpress!./lib/frontexpress.js';

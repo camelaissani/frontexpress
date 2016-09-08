@@ -1,15 +1,15 @@
-var webpack = require('webpack');
-var path = require('path');
+import webpack from 'webpack';
+import path  from 'path';
 
-var frontend = {
-    entry: path.join(__dirname, 'lib','frontexpress.js'),
+export default {
+    entry: path.join(__dirname, 'index.js'),
     output: {
         path: __dirname,
         filename: 'frontexpress.min.js'
     },
     module: {
         loaders: [
-            { test: /\.js/, loader: 'babel-loader' },
+            { test: /\.js/, loader: 'babel-loader' }
         ]
     },
     plugins: [
@@ -18,5 +18,3 @@ var frontend = {
         new webpack.optimize.UglifyJsPlugin({ mangle: false, sourcemap: false }),
     ],
 };
-
-module.exports = [frontend];
