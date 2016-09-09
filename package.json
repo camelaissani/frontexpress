@@ -1,13 +1,14 @@
 {
   "name": "frontexpress",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Frontexpress manages routes in browser like ExpressJS on Node",
   "main": "dist/frontexpress.js",
   "scripts": {
     "lint": "eslint .",
     "only-test": "mocha --compilers js:babel-core/register",
     "test": "npm run lint && babel-node node_modules/.bin/babel-istanbul cover node_modules/.bin/_mocha",
-    "prepublish": "rimraf dist && babel lib -d dist && webpack"
+    "frontpackage": "webpack",
+    "prepublish": "rimraf dist && babel lib -d dist"
   },
   "author": "Camel Aissani <camel.aissani@gmail.com> (https://nuageprive.fr)",
   "license": "MIT",
