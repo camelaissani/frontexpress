@@ -1,6 +1,6 @@
 {
   "name": "frontexpress",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Frontexpress manages routes in browser like ExpressJS on Node",
   "main": "dist/frontexpress.js",
   "scripts": {
