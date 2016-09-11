@@ -1,33 +1,29 @@
 import webpack from 'webpack';
 import path  from 'path';
 
-const entry = path.join(__dirname, 'index.js');
-const module = {
-    loaders: [{
-        test: /\.js/,
-        loader: 'babel-loader'
-    }]
-};
-const output = (min=false) => {
-    const filename = min?'frontexpress.min.js':'frontexpress.js';
+const script = (name, min=false) => {
     return {
-        path: __dirname,
-        filename
+        entry: path.join(__dirname, 'index.js'),
+        output: {
+            path: __dirname,
+            filename: min?`${name}.min.js`:`${name}.js`
+        },
+        devtool: min?'source-map':null,
+        module: {
+            loaders: [{
+                test: /\.js/,
+                loader: 'babel-loader'
+            }]
+        },
+        plugins: !min?[]:[
+            new webpack.optimize.DedupePlugin(),
+            new webpack.optimize.OccurenceOrderPlugin(),
+            new webpack.optimize.UglifyJsPlugin(),
+        ],
     };
 };
 
-export default [{
-    entry,
-    output: output(true),
-    module,
-    plugins: [
-        new webpack.optimize.DedupePlugin(),
-        new webpack.optimize.OccurenceOrderPlugin(),
-        new webpack.optimize.UglifyJsPlugin(),
-    ],
-},
-{
-    entry,
-    output: output(),
-    module
-}];
+export default [
+    script('frontexpress'),
+    script('frontexpress', true)
+];

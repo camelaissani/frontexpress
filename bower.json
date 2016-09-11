@@ -22,7 +22,6 @@
     "**/.*",
     "index.js",
     "webpack.config.babel.js",
-    "lib",
     "node_modules",
     "bower_components",
     "test",
