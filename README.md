@@ -47,6 +47,10 @@ $ npm install frontexpress
 $ bower install frontexpress
 ```
 
+### From CDN
+
+On [jsDelivr](http://www.jsdelivr.com/?query=frontexpress)
+
 ## Quick Start
 
  The quickest way to get started with frontexpress is to clone the [frontexpress-demo](https://github.com/camelaissani/frontexpress-demo) repository.
