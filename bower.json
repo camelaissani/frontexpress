@@ -21,7 +21,8 @@
   "ignore": [
     "**/.*",
     "index.js",
-    "webpack.config.babel.js",
+    "rollup.config.dev.js",
+    "rollup.config.prod.js",
     "node_modules",
     "bower_components",
     "test",
