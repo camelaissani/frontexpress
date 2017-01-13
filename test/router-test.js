@@ -103,7 +103,7 @@ describe('Router', () => {
 
         it('no root path and regexp uri', ()=> {
             const router = frontexpress.Router();
-            const middleware = frontexpress.Middleware();
+            const middleware = new frontexpress.Middleware();
 
             router.get(/^\/route1/, middleware);
 
@@ -118,7 +118,7 @@ describe('Router', () => {
         it('with root path /route1 and path /subroute', () => {
             const router = frontexpress.Router('/route1');
 
-            router.get('/subroute', frontexpress.Middleware());
+            router.get('/subroute', new frontexpress.Middleware());
 
             const r = router.routes('/route1/subroute', 'GET');
             assert(r.length === 1);
@@ -128,7 +128,7 @@ describe('Router', () => {
         it('with root path /route1 and no path uri', () => {
             const router = frontexpress.Router('/route1');
 
-            router.get(frontexpress.Middleware());
+            router.get(new frontexpress.Middleware());
 
             const r = router.routes('/route1', 'GET');
             assert(r.length === 1);
@@ -138,7 +138,7 @@ describe('Router', () => {
         it('duplicate / in route', () => {
             const router = frontexpress.Router('/route1/');
 
-            router.get('/subroute', frontexpress.Middleware());
+            router.get('/subroute', new frontexpress.Middleware());
 
             const r = router.routes('/route1/subroute', 'GET');
             assert(r.length === 1);
@@ -148,7 +148,7 @@ describe('Router', () => {
         it('spaces in route', () => {
             let router = frontexpress.Router(' /route1 ');
 
-            router.get('/subroute  ', frontexpress.Middleware());
+            router.get('/subroute  ', new frontexpress.Middleware());
 
             let r = router.routes('/route1/subroute', 'GET');
             assert(r.length === 1);
@@ -158,7 +158,7 @@ describe('Router', () => {
 
             router = frontexpress.Router(' /route1 ');
 
-            router.get(frontexpress.Middleware());
+            router.get(new frontexpress.Middleware());
 
             r = router.routes('/route1', 'GET');
             assert(r.length === 1);
@@ -168,7 +168,7 @@ describe('Router', () => {
         it('route with query string', () => {
             let router = frontexpress.Router('/route1 ');
 
-            router.get('/subroute', frontexpress.Middleware());
+            router.get('/subroute', new frontexpress.Middleware());
 
             let r = router.routes('/route1/subroute?a=b&c=d', 'GET');
             assert(r.length === 1);
@@ -179,7 +179,7 @@ describe('Router', () => {
         it('route with anchor', () => {
             let router = frontexpress.Router('/route1 ');
 
-            router.get('/subroute', frontexpress.Middleware());
+            router.get('/subroute', new frontexpress.Middleware());
 
             let r = router.routes('/route1/subroute#a=b&c=d', 'GET');
             assert(r.length === 1);
@@ -190,7 +190,7 @@ describe('Router', () => {
         it('route with query string and anchor', () => {
             let router = frontexpress.Router('/route1 ');
 
-            router.get('/subroute', frontexpress.Middleware());
+            router.get('/subroute', new frontexpress.Middleware());
 
             let r = router.routes('/route1/subroute?a=b&c=d#anchor1', 'GET');
             assert(r.length === 1);
@@ -214,7 +214,7 @@ describe('Router', () => {
 
         it('only middleware as argument', () => {
             const router = frontexpress.Router('/route1');
-            const middleware = frontexpress.Middleware();
+            const middleware = new frontexpress.Middleware();
 
             const spied_methods = [];
             for (const method of HTTP_METHODS) {
@@ -230,7 +230,7 @@ describe('Router', () => {
 
         it('with path /route1 and middleware as arguments', () => {
             const router = frontexpress.Router();
-            const middleware = frontexpress.Middleware();
+            const middleware = new frontexpress.Middleware();
 
             const spied_methods = [];
             for (const method of HTTP_METHODS) {
@@ -260,7 +260,7 @@ describe('Router', () => {
 
         it('only middleware as argument', () => {
             const router = frontexpress.Router('/');
-            const middleware = frontexpress.Middleware();
+            const middleware = new frontexpress.Middleware();
 
             router.get(middleware);
 
@@ -273,7 +273,7 @@ describe('Router', () => {
 
         it('with path /route1 and middleware as arguments', () => {
             const router = frontexpress.Router();
-            const middleware = frontexpress.Middleware();
+            const middleware = new frontexpress.Middleware();
 
             router.get('/route1', middleware);
 
@@ -286,13 +286,13 @@ describe('Router', () => {
 
         it('router with regexp and route with /route1', () => {
             const router = frontexpress.Router(/^\//);
-            const middleware = frontexpress.Middleware();
+            const middleware = new frontexpress.Middleware();
             chai.expect(() => router.get('/route1', middleware)).to.throw(TypeError);
         });
 
         it('router with regexp and route without uri', () => {
             const router = frontexpress.Router(/^\/part/);
-            const middleware = frontexpress.Middleware();
+            const middleware = new frontexpress.Middleware();
             router.get(middleware);
 
             const r = router.routes('/part1', 'GET');

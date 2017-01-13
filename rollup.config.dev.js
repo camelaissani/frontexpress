@@ -1,13 +1,15 @@
 import babel from 'rollup-plugin-babel';
-import uglify from 'rollup-plugin-uglify';
 
 export default {
     entry: 'lib/frontexpress.js',
-    format: 'umd',
+    format: 'iife',
     moduleName:'frontexpress',
     plugins: [babel({
         babelrc: false,
-        presets: ['es2015-rollup']
+        // exclude: 'node_modules/**',
+        presets: ['es2015-rollup'],
+        // externalHelpers: true,
+        // plugins: ['external-helpers']
     })],
     dest: 'frontexpress.js'
 };

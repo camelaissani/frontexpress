@@ -378,15 +378,16 @@ describe('Requester', () => {
                 });
         });
 
-        it('request returns unknown error', () => {
-            const requester = new Requester();
+        // Removed for reducing size of frontexpress
+        // it('request returns unknown error', () => {
+        //     const requester = new Requester();
 
-            const {stub_open, stub_send} = xHttpWillThrow(xhttp, 'BlaBlaError');
+        //     const {stub_open, stub_send} = xHttpWillThrow(xhttp, 'BlaBlaError');
 
-            chai.expect(() => {
-                requester.fetch({method: 'GET', uri:'/route1'});
-            }).to.throw(/BlaBlaError/);
+        //     chai.expect(() => {
+        //         requester.fetch({method: 'GET', uri:'/route1'});
+        //     }).to.throw(/BlaBlaError/);
 
-        });
+        // });
     });
 });

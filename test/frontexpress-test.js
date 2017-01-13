@@ -18,10 +18,10 @@ describe('frontexpress', () => {
 
     it('test Middleware class exposed', () => {
         assert(frontexpress.Middleware);
-        assert(frontexpress.Middleware() instanceof Middleware);
+        assert(new frontexpress.Middleware() instanceof Middleware);
 
-        const m1 = frontexpress.Middleware();
-        const m2 = frontexpress.Middleware();
+        const m1 = new frontexpress.Middleware();
+        const m2 = new frontexpress.Middleware();
         assert(m1 !== m2);
     });
 

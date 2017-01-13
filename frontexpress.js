@@ -1,15 +1,14 @@
-(function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-  typeof define === 'function' && define.amd ? define(factory) :
-  (global.frontexpress = factory());
-}(this, (function () { 'use strict';
+var frontexpress = (function () {
+'use strict';
 
 /**
  * HTTP method list
  * @private
  */
 
-var HTTP_METHODS = ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH'];
+var HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE'];
+// not supported yet
+// HEAD', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH';
 
 var classCallCheck = function (instance, Constructor) {
   if (!(instance instanceof Constructor)) {
@@ -59,29 +58,45 @@ var createClass = function () {
 
 
 
-var set$1 = function set$1(object, property, value, receiver) {
-  var desc = Object.getOwnPropertyDescriptor(object, property);
 
-  if (desc === undefined) {
-    var parent = Object.getPrototypeOf(object);
 
-    if (parent !== null) {
-      set$1(parent, property, value, receiver);
+var slicedToArray = function () {
+  function sliceIterator(arr, i) {
+    var _arr = [];
+    var _n = true;
+    var _d = false;
+    var _e = undefined;
+
+    try {
+      for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+        _arr.push(_s.value);
+
+        if (i && _arr.length === i) break;
+      }
+    } catch (err) {
+      _d = true;
+      _e = err;
+    } finally {
+      try {
+        if (!_n && _i["return"]) _i["return"]();
+      } finally {
+        if (_d) throw _e;
+      }
     }
-  } else if ("value" in desc && desc.writable) {
-    desc.value = value;
-  } else {
-    var setter = desc.set;
 
-    if (setter !== undefined) {
-      setter.call(receiver, value);
-    }
+    return _arr;
   }
 
-  return value;
-};
-
-
+  return function (arr, i) {
+    if (Array.isArray(arr)) {
+      return arr;
+    } else if (Symbol.iterator in Object(arr)) {
+      return sliceIterator(arr, i);
+    } else {
+      throw new TypeError("Invalid attempt to destructure non-iterable instance");
+    }
+  };
+}();
 
 
 
@@ -129,25 +144,33 @@ var Requester = function () {
          */
 
         value: function fetch(request, resolve, reject) {
-            var _this = this;
-
-            var method = request.method;
-            var uri = request.uri;
-            var headers = request.headers;
-            var data = request.data;
+            var method = request.method,
+                uri = request.uri,
+                headers = request.headers,
+                data = request.data;
 
 
             var success = function success(responseText) {
-                resolve(request, { status: 200, statusText: 'OK', responseText: responseText });
+                resolve(request, {
+                    status: 200,
+                    statusText: 'OK',
+                    responseText: responseText
+                });
             };
 
             var fail = function fail(_ref) {
-                var status = _ref.status;
-                var statusText = _ref.statusText;
-                var errorThrown = _ref.errorThrown;
+                var status = _ref.status,
+                    statusText = _ref.statusText,
+                    errorThrown = _ref.errorThrown;
 
-                var errors = _this._analyzeErrors({ status: status, statusText: statusText, errorThrown: errorThrown });
-                reject(request, { status: status, statusText: statusText, errorThrown: errorThrown, errors: errors });
+                // Removed for reducing size of frontexpress
+                // const errors = this._analyzeErrors({status, statusText, errorThrown});
+                reject(request, {
+                    status: status,
+                    statusText: statusText,
+                    errorThrown: errorThrown,
+                    errors: 'HTTP ' + status + ' ' + (statusText ? statusText : '')
+                });
             };
 
             var xmlhttp = new XMLHttpRequest();
@@ -198,47 +221,47 @@ var Requester = function () {
             }
         }
 
-        /**
-         * Analyse response errors.
-         *
-         * @private
-         */
+        // Removed for reducing size of frontexpress
+        // /**
+        //  * Analyse response errors.
+        //  *
+        //  * @private
+        //  */
 
-    }, {
-        key: '_analyzeErrors',
-        value: function _analyzeErrors(response) {
-            // manage exceptions
-            if (response.errorThrown) {
-                if (response.errorThrown.name === 'SyntaxError') {
-                    return 'Problem during data decoding [JSON]';
-                }
-                if (response.errorThrown.name === 'TimeoutError') {
-                    return 'Server is taking too long to reply';
-                }
-                if (response.errorThrown.name === 'AbortError') {
-                    return 'Request cancelled on server';
-                }
-                if (response.errorThrown.name === 'NetworkError') {
-                    return 'A network error occurred';
-                }
-                throw response.errorThrown;
-            }
+        // _analyzeErrors(response) {
+        //     // manage exceptions
+        //     if (response.errorThrown) {
+        //         if (response.errorThrown.name === 'SyntaxError') {
+        //             return 'Problem during data decoding [JSON]';
+        //         }
+        //         if (response.errorThrown.name === 'TimeoutError') {
+        //             return 'Server is taking too long to reply';
+        //         }
+        //         if (response.errorThrown.name === 'AbortError') {
+        //             return 'Request cancelled on server';
+        //         }
+        //         if (response.errorThrown.name === 'NetworkError') {
+        //             return 'A network error occurred';
+        //         }
+        //         throw response.errorThrown;
+        //     }
 
-            // manage status
-            if (response.status === 0) {
-                return 'Server access problem. Check your network connection';
-            }
-            if (response.status === 401) {
-                return 'Your session has expired, Please reconnect. [code: 401]';
-            }
-            if (response.status === 404) {
-                return 'Page not found on server. [code: 404]';
-            }
-            if (response.status === 500) {
-                return 'Internal server error. [code: 500]';
-            }
-            return 'Unknown error. ' + (response.statusText ? response.statusText : '');
-        }
+        //     // manage status
+        //     if (response.status === 0) {
+        //         return 'Server access problem. Check your network connection';
+        //     }
+        //     if (response.status === 401) {
+        //         return 'Your session has expired, Please reconnect. [code: 401]';
+        //     }
+        //     if (response.status === 404) {
+        //         return 'Page not found on server. [code: 404]';
+        //     }
+        //     if (response.status === 500) {
+        //         return 'Internal server error. [code: 500]';
+        //     }
+        //     return `Unknown error. ${response.statusText?response.statusText:''}`;
+        // }
+
     }]);
     return Requester;
 }();
@@ -272,40 +295,30 @@ var Settings = function () {
 
             'http GET transformer': {
                 uri: function uri(_ref) {
-                    var _uri = _ref.uri;
-                    var headers = _ref.headers;
-                    var data = _ref.data;
+                    var _uri = _ref.uri,
+                        headers = _ref.headers,
+                        data = _ref.data;
 
                     if (!data) {
                         return _uri;
                     }
+                    var uriWithoutAnchor = _uri,
+                        anchor = '';
 
-                    var anchor = '';
-                    var uriWithoutAnchor = _uri;
-                    var hashIndex = _uri.indexOf('#');
-                    if (hashIndex >= 1) {
-                        uriWithoutAnchor = _uri.slice(0, hashIndex);
-                        anchor = _uri.slice(hashIndex, _uri.length);
+                    var match = /^(.*)(#.*)$/.exec(_uri);
+                    if (match) {
+                        var _$exec = /^(.*)(#.*)$/.exec(_uri);
+
+                        var _$exec2 = slicedToArray(_$exec, 3);
+
+                        uriWithoutAnchor = _$exec2[1];
+                        anchor = _$exec2[2];
                     }
-
                     uriWithoutAnchor = Object.keys(data).reduce(function (gUri, d, index) {
-                        if (index === 0 && gUri.indexOf('?') === -1) {
-                            gUri += '?';
-                        } else {
-                            gUri += '&';
-                        }
-                        gUri += d + '=' + data[d];
+                        gUri += '' + (index === 0 && gUri.indexOf('?') === -1 ? '?' : '&') + d + '=' + data[d];
                         return gUri;
                     }, uriWithoutAnchor);
-
                     return uriWithoutAnchor + anchor;
-                },
-                data: function data(_ref2) {
-                    var uri = _ref2.uri;
-                    var headers = _ref2.headers;
-                    var _data = _ref2.data;
-
-                    return undefined;
                 }
             }
         };
@@ -329,7 +342,7 @@ var Settings = function () {
 
     createClass(Settings, [{
         key: 'set',
-        value: function set(name, value) {
+        value: function set$$1(name, value) {
             var checkRules = this.rules[name];
             if (checkRules) {
                 checkRules(value);
@@ -346,7 +359,7 @@ var Settings = function () {
 
     }, {
         key: 'get',
-        value: function get(name) {
+        value: function get$$1(name) {
             return this.settings[name];
         }
     }]);
@@ -367,7 +380,7 @@ var Middleware = function () {
    */
 
   function Middleware() {
-    var name = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+    var name = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
     classCallCheck(this, Middleware);
 
     this.name = name;
@@ -384,66 +397,61 @@ var Middleware = function () {
    * @public
    */
 
+  // entered(request) { }
+
+
+  /**
+   * Invoked by the app before a new ajax request is sent or before the DOM is unloaded.
+   * See Application#_callMiddlewareExited documentation for details.
+   *
+   * Override this method to add your custom behaviour
+   *
+   * @param {Object} request
+   * @public
+   */
+
+  // exited(request) { }
+
+
+  /**
+   * Invoked by the app after an ajax request has responded or on DOM ready
+   * (document.readyState === 'interactive').
+   * See Application#_callMiddlewareUpdated documentation for details.
+   *
+   * Override this method to add your custom behaviour
+   *
+   * @param {Object} request
+   * @param {Object} response
+   * @public
+   */
+
+  // updated(request, response) { }
+
+
+  /**
+   * Invoked by the app when an ajax request has failed.
+   *
+   * Override this method to add your custom behaviour
+   *
+   * @param {Object} request
+   * @param {Object} response
+   * @public
+   */
+  // failed(request, response) { }
+
+
+  /**
+   * Allow the hand over to the next middleware object or function.
+   *
+   * Override this method and return `false` to break execution of
+   * middleware chain.
+   *
+   * @return {Boolean} `true` by default
+   *
+   * @public
+   */
+
   createClass(Middleware, [{
-    key: 'entered',
-    value: function entered(request) {}
-
-    /**
-     * Invoked by the app before a new ajax request is sent or before the DOM is unloaded.
-     * See Application#_callMiddlewareExited documentation for details.
-     *
-     * Override this method to add your custom behaviour
-     *
-     * @param {Object} request
-     * @public
-     */
-
-  }, {
-    key: 'exited',
-    value: function exited(request) {}
-
-    /**
-     * Invoked by the app after an ajax request has responded or on DOM ready
-     * (document.readyState === 'interactive').
-     * See Application#_callMiddlewareUpdated documentation for details.
-     *
-     * Override this method to add your custom behaviour
-     *
-     * @param {Object} request
-     * @param {Object} response
-     * @public
-     */
-
-  }, {
-    key: 'updated',
-    value: function updated(request, response) {}
-
-    /**
-     * Invoked by the app when an ajax request has failed.
-     *
-     * Override this method to add your custom behaviour
-     *
-     * @param {Object} request
-     * @param {Object} response
-     * @public
-     */
-
-  }, {
-    key: 'failed',
-    value: function failed(request, response) {}
-
-    /**
-     * Allow the hand over to the next middleware object or function.
-     *
-     * Override this method and return `false` to break execution of
-     * middleware chain.
-     *
-     * @return {Boolean} `true` by default
-     *
-     * @public
-     */
-
-  }, {
     key: 'next',
     value: function next() {
       return true;
@@ -488,7 +496,7 @@ var Route = function () {
 
     createClass(Route, [{
         key: 'uri',
-        get: function get() {
+        get: function get$$1() {
             if (!this.uriPart && !this.method) {
                 return undefined;
             }
@@ -709,7 +717,7 @@ var Router = function () {
         }
     }, {
         key: 'baseUri',
-        set: function set(uri) {
+        set: function set$$1(uri) {
             if (!uri) {
                 return;
             }
@@ -735,7 +743,7 @@ var Router = function () {
          */
 
         ,
-        get: function get() {
+        get: function get$$1() {
             return this._baseUri;
         }
     }]);
@@ -868,20 +876,19 @@ var Application = function () {
 
     createClass(Application, [{
         key: 'set',
-        value: function set() {
+        value: function set$$1() {
             for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
                 args[_key] = arguments[_key];
             }
 
             // get behaviour
             if (args.length === 1) {
-                var _name = [args];
-                return this.settings.get(_name);
+                return this.settings.get([args]);
             }
 
             // set behaviour
-            var name = args[0];
-            var value = args[1];
+            var name = args[0],
+                value = args[1];
 
             this.settings.set(name, value);
 
@@ -910,19 +917,19 @@ var Application = function () {
             var _this = this;
 
             window.onbeforeunload = function () {
-                _this._callMiddlewareExited();
+                _this._callMiddlewareMethod('exited');
             };
 
             window.onpopstate = function (event) {
                 if (event.state) {
-                    var _event$state = event.state;
-                    var request = _event$state.request;
-                    var response = _event$state.response;
+                    var _event$state = event.state,
+                        request = _event$state.request,
+                        response = _event$state.response;
 
                     var currentRoutes = _this._routes(request.uri, request.method);
 
-                    _this._callMiddlewareEntered(currentRoutes, request);
-                    _this._callMiddlewareUpdated(currentRoutes, request, response);
+                    _this._callMiddlewareMethod('entered', currentRoutes, request);
+                    _this._callMiddlewareMethod('updated', currentRoutes, request, response);
                 }
             };
 
@@ -933,14 +940,14 @@ var Application = function () {
                 // DOM state
                 if (document.readyState === 'loading' && !_this.isDOMLoaded) {
                     _this.isDOMLoaded = true;
-                    _this._callMiddlewareEntered(currentRoutes, request);
+                    _this._callMiddlewareMethod('entered', currentRoutes, request);
                 } else if (document.readyState === 'interactive' && !_this.isDOMReady) {
                     if (!_this.isDOMLoaded) {
                         _this.isDOMLoaded = true;
-                        _this._callMiddlewareEntered(currentRoutes, request);
+                        _this._callMiddlewareMethod('entered', currentRoutes, request);
                     }
                     _this.isDOMReady = true;
-                    _this._callMiddlewareUpdated(currentRoutes, request, response);
+                    _this._callMiddlewareMethod('updated', currentRoutes, request, response);
                     if (callback) {
                         callback(request, response);
                     }
@@ -993,30 +1000,24 @@ var Application = function () {
                 args[_key2] = arguments[_key2];
             }
 
-            if (args.length === 0) {
-                throw new TypeError('use method takes at least a middleware or a router');
-            }
-
+            var errorMsg = 'use method takes at least a middleware or a router';
             var baseUri = void 0,
                 middleware = void 0,
                 router = void 0,
                 which = void 0;
-
-            if (args.length === 1) {
+            if (!args || args.length === 0) {
+                throw new TypeError(errorMsg);
+            } else if (args.length === 1) {
                 which = args[0];
             } else {
                 baseUri = args[0];
                 which = args[1];
             }
 
-            if (!(which instanceof Middleware) && typeof which !== 'function' && !(which instanceof Router)) {
-                throw new TypeError('use method takes at least a middleware or a router');
-            }
-
             if (which instanceof Router) {
                 router = which;
                 router.baseUri = baseUri;
-            } else {
+            } else if (which instanceof Middleware || typeof which === 'function') {
                 middleware = which;
                 router = new Router(baseUri);
                 var _iteratorNormalCompletion = true;
@@ -1043,6 +1044,8 @@ var Application = function () {
                         }
                     }
                 }
+            } else {
+                throw new TypeError(errorMsg);
             }
             this.routers.push(router);
 
@@ -1059,8 +1062,8 @@ var Application = function () {
     }, {
         key: '_routes',
         value: function _routes() {
-            var uri = arguments.length <= 0 || arguments[0] === undefined ? window.location.pathname + window.location.search : arguments[0];
-            var method = arguments.length <= 1 || arguments[1] === undefined ? 'GET' : arguments[1];
+            var uri = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : window.location.pathname + window.location.search;
+            var method = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'GET';
 
             var currentRoutes = [];
             var _iteratorNormalCompletion2 = true;
@@ -1071,8 +1074,7 @@ var Application = function () {
                 for (var _iterator2 = this.routers[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
                     var router = _step2.value;
 
-                    var routes = router.routes(uri, method);
-                    currentRoutes.push.apply(currentRoutes, toConsumableArray(routes));
+                    currentRoutes.push.apply(currentRoutes, toConsumableArray(router.routes(uri, method)));
                 }
             } catch (err) {
                 _didIteratorError2 = true;
@@ -1093,146 +1095,95 @@ var Application = function () {
         }
 
         /**
-         * Call `Middleware#entered` on _currentRoutes_.
-         * Invoked before sending ajax request or when DOM
-         * is loading (document.readyState === 'loading').
+         * Call `Middleware` method or middleware function on _currentRoutes_.
          *
          * @private
          */
 
     }, {
-        key: '_callMiddlewareEntered',
-        value: function _callMiddlewareEntered(currentRoutes, request) {
-            var _iteratorNormalCompletion3 = true;
-            var _didIteratorError3 = false;
-            var _iteratorError3 = undefined;
+        key: '_callMiddlewareMethod',
+        value: function _callMiddlewareMethod(meth, currentRoutes, request, response) {
+            if (meth === 'exited') {
+                // currentRoutes, request, response params not needed
+                var _iteratorNormalCompletion3 = true;
+                var _didIteratorError3 = false;
+                var _iteratorError3 = undefined;
 
-            try {
-                for (var _iterator3 = currentRoutes[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                    var route = _step3.value;
-
-                    if (route.middleware.entered) {
-                        route.middleware.entered(request);
-                    }
-                    if (route.middleware.next && !route.middleware.next()) {
-                        break;
-                    }
-                }
-            } catch (err) {
-                _didIteratorError3 = true;
-                _iteratorError3 = err;
-            } finally {
                 try {
-                    if (!_iteratorNormalCompletion3 && _iterator3.return) {
-                        _iterator3.return();
-                    }
-                } finally {
-                    if (_didIteratorError3) {
-                        throw _iteratorError3;
-                    }
-                }
-            }
-        }
+                    for (var _iterator3 = this.routers[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                        var router = _step3.value;
+                        var _iteratorNormalCompletion4 = true;
+                        var _didIteratorError4 = false;
+                        var _iteratorError4 = undefined;
 
-        /**
-         * Call `Middleware#updated` or middleware function on _currentRoutes_.
-         * Invoked on ajax request responding or on DOM ready
-         * (document.readyState === 'interactive').
-         *
-         * @private
-         */
+                        try {
+                            for (var _iterator4 = router.visited()[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                                var route = _step4.value;
 
-    }, {
-        key: '_callMiddlewareUpdated',
-        value: function _callMiddlewareUpdated(currentRoutes, request, response) {
-            var _iteratorNormalCompletion4 = true;
-            var _didIteratorError4 = false;
-            var _iteratorError4 = undefined;
-
-            try {
-                for (var _iterator4 = currentRoutes[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                    var route = _step4.value;
-
-                    route.visited = request;
-                    // calls middleware updated method
-                    if (route.middleware.updated) {
-                        route.middleware.updated(request, response);
-                        if (route.middleware.next && !route.middleware.next()) {
-                            break;
+                                if (route.middleware.exited) {
+                                    route.middleware.exited(route.visited);
+                                    route.visited = null;
+                                }
+                            }
+                        } catch (err) {
+                            _didIteratorError4 = true;
+                            _iteratorError4 = err;
+                        } finally {
+                            try {
+                                if (!_iteratorNormalCompletion4 && _iterator4.return) {
+                                    _iterator4.return();
+                                }
+                            } finally {
+                                if (_didIteratorError4) {
+                                    throw _iteratorError4;
+                                }
+                            }
                         }
-                    } else {
-                        // calls middleware method
-                        var breakMiddlewareLoop = true;
-                        var next = function next() {
-                            breakMiddlewareLoop = false;
-                        };
-                        route.middleware(request, response, next);
-                        if (breakMiddlewareLoop) {
-                            break;
+                    }
+                } catch (err) {
+                    _didIteratorError3 = true;
+                    _iteratorError3 = err;
+                } finally {
+                    try {
+                        if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                            _iterator3.return();
+                        }
+                    } finally {
+                        if (_didIteratorError3) {
+                            throw _iteratorError3;
                         }
                     }
                 }
-            } catch (err) {
-                _didIteratorError4 = true;
-                _iteratorError4 = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion4 && _iterator4.return) {
-                        _iterator4.return();
-                    }
-                } finally {
-                    if (_didIteratorError4) {
-                        throw _iteratorError4;
-                    }
-                }
+
+                return;
             }
-        }
 
-        /**
-         * Call `Middleware#exited` on _currentRoutes_.
-         * Invoked before sending a new ajax request or before DOM unloading.
-         *
-         * @private
-         */
-
-    }, {
-        key: '_callMiddlewareExited',
-        value: function _callMiddlewareExited() {
-            // calls middleware exited method
             var _iteratorNormalCompletion5 = true;
             var _didIteratorError5 = false;
             var _iteratorError5 = undefined;
 
             try {
-                for (var _iterator5 = this.routers[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-                    var router = _step5.value;
+                for (var _iterator5 = currentRoutes[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+                    var _route = _step5.value;
 
-                    var routes = router.visited();
-                    var _iteratorNormalCompletion6 = true;
-                    var _didIteratorError6 = false;
-                    var _iteratorError6 = undefined;
+                    if (meth === 'updated') {
+                        _route.visited = request;
+                    }
 
-                    try {
-                        for (var _iterator6 = routes[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-                            var route = _step6.value;
-
-                            if (route.middleware.exited) {
-                                route.middleware.exited(route.visited);
-                                route.visited = null;
-                            }
+                    if (_route.middleware[meth]) {
+                        _route.middleware[meth](request, response);
+                        if (_route.middleware.next && !_route.middleware.next()) {
+                            break;
                         }
-                    } catch (err) {
-                        _didIteratorError6 = true;
-                        _iteratorError6 = err;
-                    } finally {
-                        try {
-                            if (!_iteratorNormalCompletion6 && _iterator6.return) {
-                                _iterator6.return();
-                            }
-                        } finally {
-                            if (_didIteratorError6) {
-                                throw _iteratorError6;
-                            }
+                    } else if (meth !== 'entered') {
+                        // calls middleware method
+                        var breakMiddlewareLoop = true;
+                        var next = function next() {
+                            breakMiddlewareLoop = false;
+                        };
+                        _route.middleware(request, response, next);
+                        if (breakMiddlewareLoop) {
+                            break;
                         }
                     }
                 }
@@ -1253,58 +1204,6 @@ var Application = function () {
         }
 
         /**
-         * Call `Middleware#failed` or middleware function on _currentRoutes_.
-         * Invoked when ajax request fails.
-         *
-         * @private
-         */
-
-    }, {
-        key: '_callMiddlewareFailed',
-        value: function _callMiddlewareFailed(currentRoutes, request, response) {
-            var _iteratorNormalCompletion7 = true;
-            var _didIteratorError7 = false;
-            var _iteratorError7 = undefined;
-
-            try {
-                for (var _iterator7 = currentRoutes[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-                    var route = _step7.value;
-
-                    // calls middleware failed method
-                    if (route.middleware.failed) {
-                        route.middleware.failed(request, response);
-                        if (route.middleware.next && !route.middleware.next()) {
-                            break;
-                        }
-                    } else {
-                        // calls middleware method
-                        var breakMiddlewareLoop = true;
-                        var next = function next() {
-                            breakMiddlewareLoop = false;
-                        };
-                        route.middleware(request, response, next);
-                        if (breakMiddlewareLoop) {
-                            break;
-                        }
-                    }
-                }
-            } catch (err) {
-                _didIteratorError7 = true;
-                _iteratorError7 = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion7 && _iterator7.return) {
-                        _iterator7.return();
-                    }
-                } finally {
-                    if (_didIteratorError7) {
-                        throw _iteratorError7;
-                    }
-                }
-            }
-        }
-
-        /**
          * Make an ajax request. Manage History#pushState if history object set.
          *
          * @private
@@ -1315,11 +1214,11 @@ var Application = function () {
         value: function _fetch(request, resolve, reject) {
             var _this2 = this;
 
-            var method = request.method;
-            var uri = request.uri;
-            var headers = request.headers;
-            var data = request.data;
-            var history = request.history;
+            var method = request.method,
+                uri = request.uri,
+                headers = request.headers,
+                data = request.data,
+                history = request.history;
 
 
             var httpMethodTransformer = this.get('http ' + method + ' transformer');
@@ -1330,25 +1229,25 @@ var Application = function () {
             }
 
             // calls middleware exited method
-            this._callMiddlewareExited();
+            this._callMiddlewareMethod('exited');
 
             // gathers all routes impacted by the uri
             var currentRoutes = this._routes(uri, method);
 
             // calls middleware entered method
-            this._callMiddlewareEntered(currentRoutes, request);
+            this._callMiddlewareMethod('entered', currentRoutes, request);
 
             // invokes http request
             this.settings.get('http requester').fetch(request, function (req, res) {
                 if (history) {
                     window.history.pushState({ request: req, response: res }, history.title, history.uri);
                 }
-                _this2._callMiddlewareUpdated(currentRoutes, req, res);
+                _this2._callMiddlewareMethod('updated', currentRoutes, req, res);
                 if (resolve) {
                     resolve(req, res);
                 }
             }, function (req, res) {
-                _this2._callMiddlewareFailed(currentRoutes, req, res);
+                _this2._callMiddlewareMethod('failed', currentRoutes, req, res);
                 if (reject) {
                     reject(req, res);
                 }
@@ -1388,26 +1287,17 @@ HTTP_METHODS.reduce(function (reqProto, method) {
             args[_key3] = arguments[_key3];
         }
 
-        if (middlewareMethodName === 'get') {
-            if (args.length === 0) {
-                throw new TypeError(middlewareMethodName + ' method takes at least a string or a middleware');
-            } else if (args.length === 1) {
-                var name = args[0];
-
-                if (typeof name === 'string') {
-                    return this.settings.get(name);
-                }
-            }
-        } else if (args.length === 0) {
-            throw new TypeError(middlewareMethodName + ' method takes at least a middleware');
-        }
-
         var baseUri = void 0,
             middleware = void 0,
             which = void 0;
-
-        if (args.length === 1) {
+        if (!args || args.length === 0) {
+            throw new TypeError(middlewareMethodName + ' method takes at least a middleware ' + (middlewareMethodName === 'get' ? 'or a string' : ''));
+        } else if (args.length === 1) {
             which = args[0];
+
+            if (middlewareMethodName === 'get' && typeof which === 'string') {
+                return this.settings.get(which);
+            }
         } else {
             baseUri = args[0];
             which = args[1];
@@ -1417,8 +1307,8 @@ HTTP_METHODS.reduce(function (reqProto, method) {
             throw new TypeError(middlewareMethodName + ' method takes at least a middleware');
         }
 
-        var router = new Router();
         middleware = which;
+        var router = new Router();
         router[middlewareMethodName](baseUri, middleware);
 
         this.routers.push(router);
@@ -1448,10 +1338,10 @@ HTTP_METHODS.reduce(function (reqProto, method) {
      */
     var httpMethodName = 'http' + method.charAt(0).toUpperCase() + method.slice(1).toLowerCase();
     reqProto[httpMethodName] = function (request, resolve, reject) {
-        var uri = request.uri;
-        var headers = request.headers;
-        var data = request.data;
-        var history = request.history;
+        var uri = request.uri,
+            headers = request.headers,
+            data = request.data,
+            history = request.history;
 
         if (!uri) {
             uri = request;
@@ -1489,10 +1379,8 @@ var frontexpress = function frontexpress() {
 frontexpress.Router = function (baseUri) {
   return new Router(baseUri);
 };
-frontexpress.Middleware = function (name) {
-  return new Middleware(name);
-};
+frontexpress.Middleware = Middleware;
 
 return frontexpress;
 
-})));
+}());

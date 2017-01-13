@@ -11,7 +11,7 @@ describe('Settings', () => {
             const dataFn = settings.get('http GET transformer').data;
 
             assert(uriFn({uri: '/route', data:{a:'b', c:'d'}}) === '/route?a=b&c=d');
-            assert(dataFn({uri: '/route', data:{a:'b', c:'d'}}) === undefined);
+            assert(dataFn === undefined);
         });
 
         it('uri with query string', () => {
@@ -19,7 +19,7 @@ describe('Settings', () => {
             const dataFn = settings.get('http GET transformer').data;
 
             assert(uriFn({uri: '/route?x=y&z=a', data:{a:'b', c:'d'}}) === '/route?x=y&z=a&a=b&c=d');
-            assert(dataFn({uri: '/route?x=y&z=a', data:{a:'b', c:'d'}}) === undefined);
+            assert(dataFn === undefined);
         });
 
         it('uri with query string and anchor', () => {
@@ -27,7 +27,7 @@ describe('Settings', () => {
             const dataFn = settings.get('http GET transformer').data;
 
             assert(uriFn({uri: '/route?x=y&z=a#anchor1', data:{a:'b', c:'d'}}) === '/route?x=y&z=a&a=b&c=d#anchor1');
-            assert(dataFn({uri: '/route?x=y&z=a#anchor1', data:{a:'b', c:'d'}}) === undefined);
+            assert(dataFn === undefined);
         });
     });
 });
