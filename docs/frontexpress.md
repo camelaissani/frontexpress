@@ -15,8 +15,8 @@ Expose the Router constructor
 **Returns**: `Router`
 
 
-## frontexpress.Middleware() 
+## frontexpress.Middleware
 
-Expose the Middleware constructor
+Expose the Middleware class
 
 **Returns**: `Middleware`
