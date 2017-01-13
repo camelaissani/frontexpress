@@ -193,7 +193,7 @@ app.use('/birds', birds);
 |Frontexpress |||
 ||[frontexpress()](https://github.com/camelaissani/frontexpress/blob/master/docs/frontexpress.md#frontexpress-1)|Creates an instance of application|
 ||[frontexpress.Router()](https://github.com/camelaissani/frontexpress/blob/master/docs/frontexpress.md#frontexpressrouter)|Creates a Router object|
-||[frontexpress.Middleware()](https://github.com/camelaissani/frontexpress/blob/master/docs/frontexpress.md#frontexpressmiddleware)|Creates a Middleware object|
+||[frontexpress.Middleware](https://github.com/camelaissani/frontexpress/blob/master/docs/frontexpress.md#frontexpressmiddleware)|Returns the Middleware class |
 ||||
 |Application |||
 ||[set(setting, value)](https://github.com/camelaissani/frontexpress/blob/master/docs/application.md#applicationsetsetting-val)|Assigns a setting|
