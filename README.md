@@ -8,7 +8,7 @@
  [![Code Climate](https://codeclimate.com/github/camelaissani/frontexpress/badges/gpa.svg)](https://codeclimate.com/github/camelaissani/frontexpress)
  [![Coverage Status](https://coveralls.io/repos/github/camelaissani/frontexpress/badge.svg?branch=master)](https://coveralls.io/github/camelaissani/frontexpress?branch=master)
  ![dependencies](https://img.shields.io/gemnasium/mathiasbynens/he.svg)
- ![Size Shield](https://img.shields.io/badge/size-3.07kb-brightgreen.svg)
+ ![Size Shield](https://img.shields.io/badge/size-3.17kb-brightgreen.svg)
 
 Code the front-end logic with the same style than on the back-end with express
 

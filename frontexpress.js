@@ -10,6 +10,22 @@ var HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE'];
 // not supported yet
 // HEAD', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH';
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+  return typeof obj;
+} : function (obj) {
+  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+};
+
+
+
+
+
+
+
+
+
+
+
 var classCallCheck = function (instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -654,10 +670,18 @@ var Router = function () {
     }, {
         key: 'baseUri',
         set: function set$$1(uri) {
-            if (this._baseUri) {
-                throw new TypeError('base uri is already set');
+            if (!uri) {
+                return;
             }
-            this._baseUri = uri;
+
+            if (!this._baseUri) {
+                this._baseUri = uri;
+                return;
+            }
+
+            if (_typeof(this._baseUri) !== (typeof uri === 'undefined' ? 'undefined' : _typeof(uri))) {
+                throw new TypeError('router cannot mix regexp and uri');
+            }
         }
 
         /**
