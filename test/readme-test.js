@@ -111,7 +111,7 @@ describe('Test sample from README', () => {
 
         const router = frontexpress.Router();
 
-        // middleware that is specific to this router
+        // middleware which is specific to this router
         router.use((req, res, next) => {
             spy_log(`Time: ${Date.now()}`);
             next();

@@ -11,10 +11,7 @@ export default {
     plugins: [
         babel({
             babelrc: false,
-            // exclude: 'node_modules/**',
-            presets: ['es2015-rollup'],
-            // externalHelpers: true,
-            // plugins: ['external-helpers']
+            presets: ['es2015-rollup']
         }),
         uglify({
             compress: {

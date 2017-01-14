@@ -6,10 +6,7 @@ export default {
     moduleName:'frontexpress',
     plugins: [babel({
         babelrc: false,
-        // exclude: 'node_modules/**',
-        presets: ['es2015-rollup'],
-        // externalHelpers: true,
-        // plugins: ['external-helpers']
+        presets: ['es2015-rollup']
     })],
     dest: 'frontexpress.js'
 };

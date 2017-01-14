@@ -163,8 +163,6 @@ var Requester = function () {
                     statusText = _ref.statusText,
                     errorThrown = _ref.errorThrown;
 
-                // Removed for reducing size of frontexpress
-                // const errors = this._analyzeErrors({status, statusText, errorThrown});
                 reject(request, {
                     status: status,
                     statusText: statusText,
@@ -220,48 +218,6 @@ var Requester = function () {
                 fail({ errorThrown: errorThrown });
             }
         }
-
-        // Removed for reducing size of frontexpress
-        // /**
-        //  * Analyse response errors.
-        //  *
-        //  * @private
-        //  */
-
-        // _analyzeErrors(response) {
-        //     // manage exceptions
-        //     if (response.errorThrown) {
-        //         if (response.errorThrown.name === 'SyntaxError') {
-        //             return 'Problem during data decoding [JSON]';
-        //         }
-        //         if (response.errorThrown.name === 'TimeoutError') {
-        //             return 'Server is taking too long to reply';
-        //         }
-        //         if (response.errorThrown.name === 'AbortError') {
-        //             return 'Request cancelled on server';
-        //         }
-        //         if (response.errorThrown.name === 'NetworkError') {
-        //             return 'A network error occurred';
-        //         }
-        //         throw response.errorThrown;
-        //     }
-
-        //     // manage status
-        //     if (response.status === 0) {
-        //         return 'Server access problem. Check your network connection';
-        //     }
-        //     if (response.status === 401) {
-        //         return 'Your session has expired, Please reconnect. [code: 401]';
-        //     }
-        //     if (response.status === 404) {
-        //         return 'Page not found on server. [code: 404]';
-        //     }
-        //     if (response.status === 500) {
-        //         return 'Internal server error. [code: 500]';
-        //     }
-        //     return `Unknown error. ${response.statusText?response.statusText:''}`;
-        // }
-
     }]);
     return Requester;
 }();
@@ -509,12 +465,12 @@ var Route = function () {
                 return this.router.baseUri;
             }
 
-            if (this.router.baseUri && this.uriPart) {
-                return (this.router.baseUri.trim() + this.uriPart.trim()).replace(/\/{2,}/, '/');
-            }
-
             if (this.router.baseUri) {
-                return this.router.baseUri.trim();
+                var baseUri = this.router.baseUri.trim();
+                if (this.uriPart) {
+                    return (baseUri + this.uriPart.trim()).replace(/\/{2,}/, '/');
+                }
+                return baseUri;
             }
 
             return this.uriPart;
@@ -528,6 +484,8 @@ var Route = function () {
  * @public
  */
 
+var error_middleware_message = 'method takes at least a middleware';
+
 var Router = function () {
 
     /**
@@ -539,9 +497,7 @@ var Router = function () {
     function Router(uri) {
         classCallCheck(this, Router);
 
-        if (uri) {
-            this._baseUri = uri;
-        }
+        this._baseUri = uri;
         this._routes = [];
     }
 
@@ -576,36 +532,24 @@ var Router = function () {
         key: 'routes',
         value: function routes(uri, method) {
             return this._routes.filter(function (route) {
-                if (!route.uri && !route.method) {
-                    return true;
-                }
-                if (route.method !== method) {
+                if (route.method && route.method !== method) {
                     return false;
                 }
 
-                if (!route.uri) {
+                if (!route.uri || !uri) {
                     return true;
                 }
 
-                var uriToCheck = uri;
-
                 //remove query string from uri to test
-                var questionMarkIndex = uriToCheck.indexOf('?');
-                if (questionMarkIndex >= 0) {
-                    uriToCheck = uriToCheck.slice(0, questionMarkIndex);
-                }
-
                 //remove anchor from uri to test
-                var hashIndex = uriToCheck.indexOf('#');
-                if (hashIndex >= 0) {
-                    uriToCheck = uriToCheck.slice(0, hashIndex);
-                }
+                var match = /^(.*)\?.*#.*|(.*)(?=\?|#)|(.*[^\?#])$/.exec(uri);
+                var baseUriToCheck = match[1] || match[2] || match[3];
 
                 if (route.uri instanceof RegExp) {
-                    return uriToCheck.match(route.uri);
+                    return baseUriToCheck.match(route.uri);
                 }
 
-                return route.uri === uriToCheck;
+                return route.uri === baseUriToCheck;
             });
         }
 
@@ -642,7 +586,7 @@ var Router = function () {
         key: 'use',
         value: function use(middleware) {
             if (!(middleware instanceof Middleware) && typeof middleware !== 'function') {
-                throw new TypeError('use method takes at least a middleware');
+                throw new TypeError(error_middleware_message);
             }
 
             this._add(new Route(this, undefined, undefined, middleware));
@@ -673,19 +617,11 @@ var Router = function () {
                 args[_key] = arguments[_key];
             }
 
-            if (args.length === 0) {
-                throw new TypeError('use all method takes at least a middleware');
-            }
-            var middleware = void 0;
+            var _toParameters = toParameters(args),
+                middleware = _toParameters.middleware;
 
-            if (args.length === 1) {
-                middleware = args[0];
-            } else {
-                middleware = args[1];
-            }
-
-            if (!(middleware instanceof Middleware) && typeof middleware !== 'function') {
-                throw new TypeError('use all method takes at least a middleware');
+            if (!middleware) {
+                throw new TypeError(error_middleware_message);
             }
 
             var _iteratorNormalCompletion = true;
@@ -718,22 +654,10 @@ var Router = function () {
     }, {
         key: 'baseUri',
         set: function set$$1(uri) {
-            if (!uri) {
-                return;
+            if (this._baseUri) {
+                throw new TypeError('base uri is already set');
             }
-
-            if (!this._baseUri) {
-                this._baseUri = uri;
-                return;
-            }
-
-            if (this._baseUri instanceof RegExp) {
-                throw new TypeError('the router already contains a regexp uri ' + this._baseUri.toString() + ' It cannot be mixed with ' + uri.toString());
-            }
-
-            if (uri instanceof RegExp) {
-                throw new TypeError('the router already contains an uri ' + this._baseUri.toString() + ' It cannot be mixed with regexp ' + uri.toString());
-            }
+            this._baseUri = uri;
         }
 
         /**
@@ -788,28 +712,19 @@ try {
                 args[_key2] = arguments[_key2];
             }
 
-            if (args.length === 0) {
-                throw new TypeError('use ' + methodName + ' method takes at least a middleware');
-            }
-            var uri = void 0,
-                middleware = void 0;
+            var _toParameters2 = toParameters(args),
+                baseUri = _toParameters2.baseUri,
+                middleware = _toParameters2.middleware;
 
-            if (args.length === 1) {
-                middleware = args[0];
-            } else {
-                uri = args[0];
-                middleware = args[1];
+            if (!middleware) {
+                throw new TypeError(error_middleware_message);
             }
 
-            if (!(middleware instanceof Middleware) && typeof middleware !== 'function') {
-                throw new TypeError('use ' + methodName + ' method takes at least a middleware');
+            if (baseUri && this._baseUri && this._baseUri instanceof RegExp) {
+                throw new TypeError('router cannot mix uri/regexp');
             }
 
-            if (uri && this._baseUri && this._baseUri instanceof RegExp) {
-                throw new TypeError('router contains a regexp cannot mix with route uri/regexp');
-            }
-
-            this._add(new Route(this, uri, method, middleware));
+            this._add(new Route(this, baseUri, method, middleware));
 
             return this;
         };
@@ -1000,25 +915,14 @@ var Application = function () {
                 args[_key2] = arguments[_key2];
             }
 
-            var errorMsg = 'use method takes at least a middleware or a router';
-            var baseUri = void 0,
-                middleware = void 0,
-                router = void 0,
-                which = void 0;
-            if (!args || args.length === 0) {
-                throw new TypeError(errorMsg);
-            } else if (args.length === 1) {
-                which = args[0];
-            } else {
-                baseUri = args[0];
-                which = args[1];
-            }
+            var _toParameters = toParameters(args),
+                baseUri = _toParameters.baseUri,
+                router = _toParameters.router,
+                middleware = _toParameters.middleware;
 
-            if (which instanceof Router) {
-                router = which;
+            if (router) {
                 router.baseUri = baseUri;
-            } else if (which instanceof Middleware || typeof which === 'function') {
-                middleware = which;
+            } else if (middleware) {
                 router = new Router(baseUri);
                 var _iteratorNormalCompletion = true;
                 var _didIteratorError = false;
@@ -1045,7 +949,7 @@ var Application = function () {
                     }
                 }
             } else {
-                throw new TypeError(errorMsg);
+                throw new TypeError('method takes at least a middleware or a router');
             }
             this.routers.push(router);
 
@@ -1287,27 +1191,17 @@ HTTP_METHODS.reduce(function (reqProto, method) {
             args[_key3] = arguments[_key3];
         }
 
-        var baseUri = void 0,
-            middleware = void 0,
-            which = void 0;
-        if (!args || args.length === 0) {
-            throw new TypeError(middlewareMethodName + ' method takes at least a middleware ' + (middlewareMethodName === 'get' ? 'or a string' : ''));
-        } else if (args.length === 1) {
-            which = args[0];
+        var _toParameters2 = toParameters(args),
+            baseUri = _toParameters2.baseUri,
+            middleware = _toParameters2.middleware,
+            which = _toParameters2.which;
 
-            if (middlewareMethodName === 'get' && typeof which === 'string') {
-                return this.settings.get(which);
-            }
-        } else {
-            baseUri = args[0];
-            which = args[1];
+        if (middlewareMethodName === 'get' && typeof which === 'string') {
+            return this.settings.get(which);
         }
-
-        if (!(which instanceof Middleware) && typeof which !== 'function') {
-            throw new TypeError(middlewareMethodName + ' method takes at least a middleware');
+        if (!middleware) {
+            throw new TypeError('method takes a middleware ' + (middlewareMethodName === 'get' ? 'or a string' : ''));
         }
-
-        middleware = which;
         var router = new Router();
         router[middlewareMethodName](baseUri, middleware);
 
@@ -1357,6 +1251,32 @@ HTTP_METHODS.reduce(function (reqProto, method) {
 
     return reqProto;
 }, Application.prototype);
+
+function toParameters(args) {
+    var baseUri = void 0,
+        middleware = void 0,
+        router = void 0,
+        which = void 0;
+    if (args && args.length > 0) {
+        if (args.length === 1) {
+            var _args = slicedToArray(args, 1);
+
+            which = _args[0];
+        } else {
+            var _args2 = slicedToArray(args, 2);
+
+            baseUri = _args2[0];
+            which = _args2[1];
+        }
+
+        if (which instanceof Router) {
+            router = which;
+        } else if (which instanceof Middleware || typeof which === 'function') {
+            middleware = which;
+        }
+    }
+    return { baseUri: baseUri, middleware: middleware, router: router, which: which };
+}
 
 /**
  * Module dependencies.
