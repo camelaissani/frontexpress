@@ -190,6 +190,7 @@ var Requester = function () {
             var xmlhttp = new XMLHttpRequest();
             xmlhttp.onreadystatechange = function () {
                 if (xmlhttp.readyState === 4) {
+                    //XMLHttpRequest.DONE
                     if (xmlhttp.status === 200) {
                         success(xmlhttp.responseText);
                     } else {
@@ -200,30 +201,9 @@ var Requester = function () {
             try {
                 xmlhttp.open(method, uri, true);
                 if (headers) {
-                    var _iteratorNormalCompletion = true;
-                    var _didIteratorError = false;
-                    var _iteratorError = undefined;
-
-                    try {
-                        for (var _iterator = Object.keys(headers)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                            var header = _step.value;
-
-                            xmlhttp.setRequestHeader(header, headers[header]);
-                        }
-                    } catch (err) {
-                        _didIteratorError = true;
-                        _iteratorError = err;
-                    } finally {
-                        try {
-                            if (!_iteratorNormalCompletion && _iterator.return) {
-                                _iterator.return();
-                            }
-                        } finally {
-                            if (_didIteratorError) {
-                                throw _iteratorError;
-                            }
-                        }
-                    }
+                    Object.keys(headers).forEach(function (header) {
+                        xmlhttp.setRequestHeader(header, headers[header]);
+                    });
                 }
                 if (data) {
                     xmlhttp.send(data);
@@ -293,6 +273,18 @@ var Settings = function () {
                     return uriWithoutAnchor + anchor;
                 }
             }
+            // 'http POST transformer': {
+            //     headers({uri, headers, data}) {
+            //         if (!data) {
+            //             return headers;
+            //         }
+            //         const updatedHeaders = headers || {};
+            //         if (!updatedHeaders['Content-Type']) {
+            //             updatedHeaders['Content-Type'] = 'application/x-www-form-urlencoded';
+            //         }
+            //         return updatedHeaders;
+            //     }
+            // }
         };
 
         this.rules = {
@@ -629,6 +621,8 @@ var Router = function () {
     }, {
         key: 'all',
         value: function all() {
+            var _this = this;
+
             for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
                 args[_key] = arguments[_key];
             }
@@ -640,31 +634,9 @@ var Router = function () {
                 throw new TypeError(error_middleware_message);
             }
 
-            var _iteratorNormalCompletion = true;
-            var _didIteratorError = false;
-            var _iteratorError = undefined;
-
-            try {
-                for (var _iterator = HTTP_METHODS[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                    var method = _step.value;
-
-                    this[method.toLowerCase()].apply(this, args);
-                }
-            } catch (err) {
-                _didIteratorError = true;
-                _iteratorError = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion && _iterator.return) {
-                        _iterator.return();
-                    }
-                } finally {
-                    if (_didIteratorError) {
-                        throw _iteratorError;
-                    }
-                }
-            }
-
+            HTTP_METHODS.forEach(function (method) {
+                _this[method.toLowerCase()].apply(_this, args);
+            });
             return this;
         }
     }, {
@@ -698,79 +670,54 @@ var Router = function () {
     return Router;
 }();
 
-var _iteratorNormalCompletion2 = true;
-var _didIteratorError2 = false;
-var _iteratorError2 = undefined;
+HTTP_METHODS.forEach(function (method) {
 
-try {
-    var _loop = function _loop() {
-        var method = _step2.value;
+    /**
+     * Use the given middleware function or object, with optional _uri_ on
+     * HTTP methods: get, post, put, delete...
+     * Default _uri_ is "/".
+     *
+     *    // middleware function will be applied on path "/"
+     *    router.get((req, res, next) => {console.log('Hello')});
+     *
+     *    // middleware object will be applied on path "/" and
+     *    router.get(new Middleware());
+     *
+     *    // middleware function will be applied on path "/user"
+     *    router.post('/user', (req, res, next) => {console.log('Hello')});
+     *
+     *    // middleware object will be applied on path "/user" and
+     *    router.post('/user', new Middleware());
+     *
+     * @param {String} uri
+     * @param {Middleware|Function} middleware object or function
+     * @return {Router} for chaining
+     * @public
+     */
 
+    var methodName = method.toLowerCase();
+    Router.prototype[methodName] = function () {
+        for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+            args[_key2] = arguments[_key2];
+        }
 
-        /**
-         * Use the given middleware function or object, with optional _uri_ on
-         * HTTP methods: get, post, put, delete...
-         * Default _uri_ is "/".
-         *
-         *    // middleware function will be applied on path "/"
-         *    router.get((req, res, next) => {console.log('Hello')});
-         *
-         *    // middleware object will be applied on path "/" and
-         *    router.get(new Middleware());
-         *
-         *    // middleware function will be applied on path "/user"
-         *    router.post('/user', (req, res, next) => {console.log('Hello')});
-         *
-         *    // middleware object will be applied on path "/user" and
-         *    router.post('/user', new Middleware());
-         *
-         * @param {String} uri
-         * @param {Middleware|Function} middleware object or function
-         * @return {Router} for chaining
-         * @public
-         */
+        var _toParameters2 = toParameters(args),
+            baseUri = _toParameters2.baseUri,
+            middleware = _toParameters2.middleware;
 
-        var methodName = method.toLowerCase();
-        Router.prototype[methodName] = function () {
-            for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-                args[_key2] = arguments[_key2];
-            }
+        if (!middleware) {
+            throw new TypeError(error_middleware_message);
+        }
 
-            var _toParameters2 = toParameters(args),
-                baseUri = _toParameters2.baseUri,
-                middleware = _toParameters2.middleware;
+        if (baseUri && this._baseUri && this._baseUri instanceof RegExp) {
+            throw new TypeError('router cannot mix uri/regexp');
+        }
 
-            if (!middleware) {
-                throw new TypeError(error_middleware_message);
-            }
+        this._add(new Route(this, baseUri, method, middleware));
 
-            if (baseUri && this._baseUri && this._baseUri instanceof RegExp) {
-                throw new TypeError('router cannot mix uri/regexp');
-            }
-
-            this._add(new Route(this, baseUri, method, middleware));
-
-            return this;
-        };
+        return this;
     };
-
-    for (var _iterator2 = HTTP_METHODS[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-        _loop();
-    }
-} catch (err) {
-    _didIteratorError2 = true;
-    _iteratorError2 = err;
-} finally {
-    try {
-        if (!_iteratorNormalCompletion2 && _iterator2.return) {
-            _iterator2.return();
-        }
-    } finally {
-        if (_didIteratorError2) {
-            throw _iteratorError2;
-        }
-    }
-}
+});
 
 /**
  * Module dependencies.
@@ -795,8 +742,8 @@ var Application = function () {
         classCallCheck(this, Application);
 
         this.routers = [];
-        this.isDOMLoaded = false;
-        this.isDOMReady = false;
+        // this.isDOMLoaded = false;
+        // this.isDOMReady = false;
         this.settings = new Settings();
     }
 
@@ -855,43 +802,51 @@ var Application = function () {
         value: function listen(callback) {
             var _this = this;
 
+            // manage history
+            window.onpopstate = function (event) {
+                if (event.state) {
+                    var _event$state = event.state,
+                        _request = _event$state.request,
+                        _response = _event$state.response;
+
+                    var _currentRoutes = _this._routes(_request.uri, _request.method);
+
+                    _this._callMiddlewareMethod('entered', _currentRoutes, _request);
+                    _this._callMiddlewareMethod('updated', _currentRoutes, _request, _response);
+                }
+            };
+
+            // manage page loading/refreshing
+            var request = { method: 'GET', uri: window.location.pathname + window.location.search };
+            var response = { status: 200, statusText: 'OK' };
+            var currentRoutes = this._routes();
+
+            var whenPageIsInteractiveFn = function whenPageIsInteractiveFn() {
+                _this._callMiddlewareMethod('updated', currentRoutes, request, response);
+                if (callback) {
+                    callback(request, response);
+                }
+            };
+
             window.onbeforeunload = function () {
                 _this._callMiddlewareMethod('exited');
             };
 
-            window.onpopstate = function (event) {
-                if (event.state) {
-                    var _event$state = event.state,
-                        request = _event$state.request,
-                        response = _event$state.response;
-
-                    var currentRoutes = _this._routes(request.uri, request.method);
-
-                    _this._callMiddlewareMethod('entered', currentRoutes, request);
-                    _this._callMiddlewareMethod('updated', currentRoutes, request, response);
-                }
-            };
-
             document.onreadystatechange = function () {
-                var request = { method: 'GET', uri: window.location.pathname + window.location.search };
-                var response = { status: 200, statusText: 'OK' };
-                var currentRoutes = _this._routes();
-                // DOM state
-                if (document.readyState === 'loading' && !_this.isDOMLoaded) {
-                    _this.isDOMLoaded = true;
-                    _this._callMiddlewareMethod('entered', currentRoutes, request);
-                } else if (document.readyState === 'interactive' && !_this.isDOMReady) {
-                    if (!_this.isDOMLoaded) {
-                        _this.isDOMLoaded = true;
+                // DOM ready state
+                switch (document.readyState) {
+                    case 'loading':
                         _this._callMiddlewareMethod('entered', currentRoutes, request);
-                    }
-                    _this.isDOMReady = true;
-                    _this._callMiddlewareMethod('updated', currentRoutes, request, response);
-                    if (callback) {
-                        callback(request, response);
-                    }
+                        break;
+                    case 'interactive':
+                        whenPageIsInteractiveFn();
+                        break;
                 }
             };
+
+            if (['interactive', 'complete'].indexOf(document.readyState) !== -1) {
+                whenPageIsInteractiveFn();
+            }
         }
 
         /**
@@ -948,30 +903,9 @@ var Application = function () {
                 router.baseUri = baseUri;
             } else if (middleware) {
                 router = new Router(baseUri);
-                var _iteratorNormalCompletion = true;
-                var _didIteratorError = false;
-                var _iteratorError = undefined;
-
-                try {
-                    for (var _iterator = HTTP_METHODS[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                        var method = _step.value;
-
-                        router[method.toLowerCase()](middleware);
-                    }
-                } catch (err) {
-                    _didIteratorError = true;
-                    _iteratorError = err;
-                } finally {
-                    try {
-                        if (!_iteratorNormalCompletion && _iterator.return) {
-                            _iterator.return();
-                        }
-                    } finally {
-                        if (_didIteratorError) {
-                            throw _iteratorError;
-                        }
-                    }
-                }
+                HTTP_METHODS.forEach(function (method) {
+                    router[method.toLowerCase()](middleware);
+                });
             } else {
                 throw new TypeError('method takes at least a middleware or a router');
             }
@@ -994,30 +928,9 @@ var Application = function () {
             var method = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'GET';
 
             var currentRoutes = [];
-            var _iteratorNormalCompletion2 = true;
-            var _didIteratorError2 = false;
-            var _iteratorError2 = undefined;
-
-            try {
-                for (var _iterator2 = this.routers[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                    var router = _step2.value;
-
-                    currentRoutes.push.apply(currentRoutes, toConsumableArray(router.routes(uri, method)));
-                }
-            } catch (err) {
-                _didIteratorError2 = true;
-                _iteratorError2 = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                        _iterator2.return();
-                    }
-                } finally {
-                    if (_didIteratorError2) {
-                        throw _iteratorError2;
-                    }
-                }
-            }
+            this.routers.forEach(function (router) {
+                currentRoutes.push.apply(currentRoutes, toConsumableArray(router.routes(uri, method)));
+            });
 
             return currentRoutes;
         }
@@ -1033,102 +946,41 @@ var Application = function () {
         value: function _callMiddlewareMethod(meth, currentRoutes, request, response) {
             if (meth === 'exited') {
                 // currentRoutes, request, response params not needed
-                var _iteratorNormalCompletion3 = true;
-                var _didIteratorError3 = false;
-                var _iteratorError3 = undefined;
-
-                try {
-                    for (var _iterator3 = this.routers[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                        var router = _step3.value;
-                        var _iteratorNormalCompletion4 = true;
-                        var _didIteratorError4 = false;
-                        var _iteratorError4 = undefined;
-
-                        try {
-                            for (var _iterator4 = router.visited()[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                                var route = _step4.value;
-
-                                if (route.middleware.exited) {
-                                    route.middleware.exited(route.visited);
-                                    route.visited = null;
-                                }
-                            }
-                        } catch (err) {
-                            _didIteratorError4 = true;
-                            _iteratorError4 = err;
-                        } finally {
-                            try {
-                                if (!_iteratorNormalCompletion4 && _iterator4.return) {
-                                    _iterator4.return();
-                                }
-                            } finally {
-                                if (_didIteratorError4) {
-                                    throw _iteratorError4;
-                                }
-                            }
+                this.routers.forEach(function (router) {
+                    router.visited().forEach(function (route) {
+                        if (route.middleware.exited) {
+                            route.middleware.exited(route.visited);
+                            route.visited = null;
                         }
-                    }
-                } catch (err) {
-                    _didIteratorError3 = true;
-                    _iteratorError3 = err;
-                } finally {
-                    try {
-                        if (!_iteratorNormalCompletion3 && _iterator3.return) {
-                            _iterator3.return();
-                        }
-                    } finally {
-                        if (_didIteratorError3) {
-                            throw _iteratorError3;
-                        }
-                    }
-                }
-
+                    });
+                });
                 return;
             }
 
-            var _iteratorNormalCompletion5 = true;
-            var _didIteratorError5 = false;
-            var _iteratorError5 = undefined;
+            currentRoutes.some(function (route) {
+                if (meth === 'updated') {
+                    route.visited = request;
+                }
 
-            try {
-                for (var _iterator5 = currentRoutes[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-                    var _route = _step5.value;
-
-                    if (meth === 'updated') {
-                        _route.visited = request;
+                if (route.middleware[meth]) {
+                    route.middleware[meth](request, response);
+                    if (route.middleware.next && !route.middleware.next()) {
+                        return true;
                     }
-
-                    if (_route.middleware[meth]) {
-                        _route.middleware[meth](request, response);
-                        if (_route.middleware.next && !_route.middleware.next()) {
-                            break;
-                        }
-                    } else if (meth !== 'entered') {
-                        // calls middleware method
-                        var breakMiddlewareLoop = true;
-                        var next = function next() {
-                            breakMiddlewareLoop = false;
-                        };
-                        _route.middleware(request, response, next);
-                        if (breakMiddlewareLoop) {
-                            break;
-                        }
+                } else if (meth !== 'entered') {
+                    // calls middleware method
+                    var breakMiddlewareLoop = true;
+                    var next = function next() {
+                        breakMiddlewareLoop = false;
+                    };
+                    route.middleware(request, response, next);
+                    if (breakMiddlewareLoop) {
+                        return true;
                     }
                 }
-            } catch (err) {
-                _didIteratorError5 = true;
-                _iteratorError5 = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion5 && _iterator5.return) {
-                        _iterator5.return();
-                    }
-                } finally {
-                    if (_didIteratorError5) {
-                        throw _iteratorError5;
-                    }
-                }
-            }
+
+                return false;
+            });
         }
 
         /**
@@ -1139,21 +991,25 @@ var Application = function () {
 
     }, {
         key: '_fetch',
-        value: function _fetch(request, resolve, reject) {
+        value: function _fetch(req, resolve, reject) {
             var _this2 = this;
 
-            var method = request.method,
-                uri = request.uri,
-                headers = request.headers,
-                data = request.data,
-                history = request.history;
+            var method = req.method,
+                uri = req.uri,
+                headers = req.headers,
+                data = req.data,
+                history = req.history;
 
 
             var httpMethodTransformer = this.get('http ' + method + ' transformer');
             if (httpMethodTransformer) {
-                uri = httpMethodTransformer.uri ? httpMethodTransformer.uri({ uri: uri, headers: headers, data: data }) : uri;
-                headers = httpMethodTransformer.headers ? httpMethodTransformer.headers({ uri: uri, headers: headers, data: data }) : headers;
-                data = httpMethodTransformer.data ? httpMethodTransformer.data({ uri: uri, headers: headers, data: data }) : data;
+                var _uriFn = httpMethodTransformer.uri,
+                    _headersFn = httpMethodTransformer.headers,
+                    _dataFn = httpMethodTransformer.data;
+
+                uri = _uriFn ? _uriFn({ uri: uri, headers: headers, data: data }) : uri;
+                headers = _headersFn ? _headersFn({ uri: uri, headers: headers, data: data }) : headers;
+                data = _dataFn ? _dataFn({ uri: uri, headers: headers, data: data }) : data;
             }
 
             // calls middleware exited method
@@ -1163,21 +1019,21 @@ var Application = function () {
             var currentRoutes = this._routes(uri, method);
 
             // calls middleware entered method
-            this._callMiddlewareMethod('entered', currentRoutes, request);
+            this._callMiddlewareMethod('entered', currentRoutes, req);
 
             // invokes http request
-            this.settings.get('http requester').fetch(request, function (req, res) {
+            this.settings.get('http requester').fetch(req, function (request, response) {
                 if (history) {
-                    window.history.pushState({ request: req, response: res }, history.title, history.uri);
+                    window.history.pushState({ request: request, response: response }, history.title, history.uri);
                 }
-                _this2._callMiddlewareMethod('updated', currentRoutes, req, res);
+                _this2._callMiddlewareMethod('updated', currentRoutes, request, response);
                 if (resolve) {
-                    resolve(req, res);
+                    resolve(request, response);
                 }
-            }, function (req, res) {
-                _this2._callMiddlewareMethod('failed', currentRoutes, req, res);
+            }, function (request, response) {
+                _this2._callMiddlewareMethod('failed', currentRoutes, request, response);
                 if (reject) {
-                    reject(req, res);
+                    reject(request, response);
                 }
             });
         }
