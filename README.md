@@ -18,12 +18,12 @@ import frontexpress from 'frontexpress';
 // Front-end application
 const app = frontexpress();
 
-// navigation on path /page1
+// front-end logic on navigation path "/page1"
 app.get('/page1', (req, res) => {
     document.querySelector('.content').innerHTML = `<h1>Page 1 content</h1>`;
 });
 
-// navigation on path /page2
+// front-end logic on navigation path "/page2"
 app.get('/page2', (req, res) => {
     document.querySelector('.content').innerHTML = `<h1>Page 2 content</h1>`;
 });
