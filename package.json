@@ -1,6 +1,6 @@
 {
   "name": "frontexpress",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Frontexpress manages routes in browser like ExpressJS on Node",
   "main": "dist/frontexpress.js",
   "jsnext:main": "lib/frontexpress.js",
@@ -53,10 +53,13 @@
     "sinon": "^1.17.6"
   },
   "files": [
-    "lib/",
     "dist/",
     "docs/",
+    "lib/",
     "README.md",
-    "LICENCE"
+    "LICENCE",
+    "frontexpress.js",
+    "frontexpress.min.js",
+    "frontexpress.min.js.map"
   ]
 }
