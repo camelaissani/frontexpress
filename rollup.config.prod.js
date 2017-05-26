@@ -1,5 +1,4 @@
-import uglify from 'rollup-plugin-uglify';
-import { minify } from 'uglify-js';
+import uglify from 'rollup-plugin-uglify-es';
 import babel from 'rollup-plugin-babel';
 
 export default {
@@ -13,13 +12,6 @@ export default {
             babelrc: false,
             presets: ['es2015-rollup']
         }),
-        uglify({
-            compress: {
-                warnings: false,
-            },
-            output: {
-                comments: false
-            }
-        }, minify)
+        uglify()
     ]
 };

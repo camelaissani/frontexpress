@@ -4,7 +4,7 @@
  [![Code Climate](https://codeclimate.com/github/camelaissani/frontexpress/badges/gpa.svg)](https://codeclimate.com/github/camelaissani/frontexpress)
  [![Coverage Status](https://coveralls.io/repos/github/camelaissani/frontexpress/badge.svg?branch=master)](https://coveralls.io/github/camelaissani/frontexpress?branch=master)
  ![dependencies](https://img.shields.io/gemnasium/mathiasbynens/he.svg)
- ![Size Shield](https://img.shields.io/badge/size-2.86kb-brightgreen.svg)
+ ![Size Shield](https://img.shields.io/badge/size-2.84kb-brightgreen.svg)
 
 Frontexpress manages routes in browser like [ExpressJS](http://expressjs.com/) does on Node.
 

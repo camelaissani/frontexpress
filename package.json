@@ -3,6 +3,7 @@
   "version": "1.0.1",
   "description": "Frontexpress manages routes in browser like ExpressJS on Node",
   "main": "dist/frontexpress.js",
+  "jsnext:main": "lib/frontexpress.js",
   "scripts": {
     "lint": "eslint .",
     "only-test": "mocha --compilers js:babel-core/register",
@@ -48,8 +49,14 @@
     "rimraf": "^2.5.4",
     "rollup": "^0.38.3",
     "rollup-plugin-babel": "^2.7.1",
-    "rollup-plugin-uglify": "^1.0.1",
-    "sinon": "^1.17.6",
-    "uglify-js": "github:mishoo/UglifyJS2#harmony"
-  }
+    "rollup-plugin-uglify-es": "0.0.1",
+    "sinon": "^1.17.6"
+  },
+  "files": [
+    "lib/",
+    "dist/",
+    "docs/",
+    "README.md",
+    "LICENCE"
+  ]
 }
