@@ -6,9 +6,9 @@ var frontexpress = (function () {
  * @private
  */
 
-var HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE'];
+var HTTP_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
 // not supported yet
-// HEAD', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH';
+// HEAD', 'CONNECT', 'OPTIONS', 'TRACE';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
   return typeof obj;
@@ -361,61 +361,66 @@ var Middleware = function () {
    * @public
    */
 
-  // entered(request) { }
-
-
-  /**
-   * Invoked by the app before a new ajax request is sent or before the DOM is unloaded.
-   * See Application#_callMiddlewareExited documentation for details.
-   *
-   * Override this method to add your custom behaviour
-   *
-   * @param {Object} request
-   * @public
-   */
-
-  // exited(request) { }
-
-
-  /**
-   * Invoked by the app after an ajax request has responded or on DOM ready
-   * (document.readyState === 'interactive').
-   * See Application#_callMiddlewareUpdated documentation for details.
-   *
-   * Override this method to add your custom behaviour
-   *
-   * @param {Object} request
-   * @param {Object} response
-   * @public
-   */
-
-  // updated(request, response) { }
-
-
-  /**
-   * Invoked by the app when an ajax request has failed.
-   *
-   * Override this method to add your custom behaviour
-   *
-   * @param {Object} request
-   * @param {Object} response
-   * @public
-   */
-  // failed(request, response) { }
-
-
-  /**
-   * Allow the hand over to the next middleware object or function.
-   *
-   * Override this method and return `false` to break execution of
-   * middleware chain.
-   *
-   * @return {Boolean} `true` by default
-   *
-   * @public
-   */
-
   createClass(Middleware, [{
+    key: 'entered',
+    value: function entered(request) {}
+
+    /**
+     * Invoked by the app before a new ajax request is sent or before the DOM is unloaded.
+     * See Application#_callMiddlewareExited documentation for details.
+     *
+     * Override this method to add your custom behaviour
+     *
+     * @param {Object} request
+     * @public
+     */
+
+  }, {
+    key: 'exited',
+    value: function exited(request) {}
+
+    /**
+     * Invoked by the app after an ajax request has responded or on DOM ready
+     * (document.readyState === 'interactive').
+     * See Application#_callMiddlewareUpdated documentation for details.
+     *
+     * Override this method to add your custom behaviour
+     *
+     * @param {Object} request
+     * @param {Object} response
+     * @public
+     */
+
+  }, {
+    key: 'updated',
+    value: function updated(request, response) {}
+
+    /**
+     * Invoked by the app when an ajax request has failed.
+     *
+     * Override this method to add your custom behaviour
+     *
+     * @param {Object} request
+     * @param {Object} response
+     * @public
+     */
+
+  }, {
+    key: 'failed',
+    value: function failed(request, response) {}
+
+    /**
+     * Allow the hand over to the next middleware object or function.
+     *
+     * Override this method and return `false` to break execution of
+     * middleware chain.
+     *
+     * @return {Boolean} `true` by default
+     *
+     * @public
+     */
+
+  }, {
     key: 'next',
     value: function next() {
       return true;
@@ -811,6 +816,7 @@ var Application = function () {
 
                     var _currentRoutes = _this._routes(_request.uri, _request.method);
 
+                    _this._callMiddlewareMethod('exited');
                     _this._callMiddlewareMethod('entered', _currentRoutes, _request);
                     _this._callMiddlewareMethod('updated', _currentRoutes, _request, _response);
                 }
@@ -832,15 +838,12 @@ var Application = function () {
                 _this._callMiddlewareMethod('exited');
             };
 
+            this._callMiddlewareMethod('entered', currentRoutes, request);
+
             document.onreadystatechange = function () {
                 // DOM ready state
-                switch (document.readyState) {
-                    case 'loading':
-                        _this._callMiddlewareMethod('entered', currentRoutes, request);
-                        break;
-                    case 'interactive':
-                        whenPageIsInteractiveFn();
-                        break;
+                if (document.readyState === 'interactive') {
+                    whenPageIsInteractiveFn();
                 }
             };
 
@@ -1007,9 +1010,9 @@ var Application = function () {
                     _headersFn = httpMethodTransformer.headers,
                     _dataFn = httpMethodTransformer.data;
 
-                uri = _uriFn ? _uriFn({ uri: uri, headers: headers, data: data }) : uri;
-                headers = _headersFn ? _headersFn({ uri: uri, headers: headers, data: data }) : headers;
-                data = _dataFn ? _dataFn({ uri: uri, headers: headers, data: data }) : data;
+                req.uri = _uriFn ? _uriFn({ uri: uri, headers: headers, data: data }) : uri;
+                req.headers = _headersFn ? _headersFn({ uri: uri, headers: headers, data: data }) : headers;
+                req.data = _dataFn ? _dataFn({ uri: uri, headers: headers, data: data }) : data;
             }
 
             // calls middleware exited method
