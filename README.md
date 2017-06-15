@@ -50,7 +50,7 @@ $ bower install frontexpress
 
 ### From CDN
 
-On [jsDelivr](http://www.jsdelivr.com/?query=frontexpress)
+On [jsDelivr](https://cdn.jsdelivr.net/npm/frontexpress@1.1.0/frontexpress.min.js)
 
 ## Quick Start
 
