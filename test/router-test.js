@@ -4,6 +4,9 @@ import sinon from 'sinon';
 import frontexpress from '../lib/frontexpress';
 import HTTP_METHODS from '../lib/methods';
 
+const application = frontexpress();
+const routeMatcher = application.get('route matcher');
+
 describe('Router', () => {
 
     describe('generated methods', () => {
@@ -12,6 +15,7 @@ describe('Router', () => {
             assert(typeof router.all === 'function');
             assert(typeof router.get === 'function');
             assert(typeof router.put === 'function');
+            assert(typeof router.patch === 'function');
             assert(typeof router.post === 'function');
             assert(typeof router.delete === 'function');
         });
@@ -46,7 +50,7 @@ describe('Router', () => {
 
             router.get(middleware);
 
-            const r1 = router.routes('/', 'GET');
+            const r1 = router.routes(application, {uri: '/', method: 'GET'});
             assert(r1.length === 1);
             assert(r1[0].uri === undefined);
             assert(r1[0].method === 'GET');
@@ -64,37 +68,37 @@ describe('Router', () => {
                 .post('/route2', middleware2)
                 .all('/route3', middleware3);
 
-            const r1 = router.routes('/route1', 'GET');
+            const r1 = router.routes(application, {uri: '/route1', method: 'GET'});
             assert(r1.length === 1);
             assert(r1[0].uri === '/route1');
             assert(r1[0].method === 'GET');
             assert(r1[0].middleware === middleware1);
 
-            const r2 = router.routes('/route2', 'POST');
+            const r2 = router.routes(application, {uri: '/route2', method: 'POST'});
             assert(r2.length === 1);
             assert(r2[0].uri === '/route2');
             assert(r2[0].method === 'POST');
             assert(r2[0].middleware === middleware2);
 
-            let r3 = router.routes('/route3', 'GET');
+            let r3 = router.routes(application, {uri: '/route3', method: 'GET'});
             assert(r3.length === 1);
             assert(r3[0].uri === '/route3');
             assert(r3[0].method === 'GET');
             assert(r3[0].middleware === middleware3);
 
-            r3 = router.routes('/route3', 'POST');
+            r3 = router.routes(application, {uri: '/route3', method: 'POST'});
             assert(r3.length === 1);
             assert(r3[0].uri === '/route3');
             assert(r3[0].method === 'POST');
             assert(r3[0].middleware === middleware3);
 
-            r3 = router.routes('/route3', 'PUT');
+            r3 = router.routes(application, {uri: '/route3', method: 'PUT'});
             assert(r3.length === 1);
             assert(r3[0].uri === '/route3');
             assert(r3[0].method === 'PUT');
             assert(r3[0].middleware === middleware3);
 
-            r3 = router.routes('/route3', 'DELETE');
+            r3 = router.routes(application, {uri: '/route3', method: 'DELETE'});
             assert(r3.length === 1);
             assert(r3[0].uri === '/route3');
             assert(r3[0].method === 'DELETE');
@@ -107,7 +111,7 @@ describe('Router', () => {
 
             router.get(/^\/route1/, middleware);
 
-            const r = router.routes('/route1', 'GET');
+            const r = router.routes(application, {uri: '/route1', method: 'GET'});
             assert(r.length === 1);
             assert(r[0].uri instanceof RegExp);
             assert(r[0].uri.toString() === new RegExp('^\/route1').toString());
@@ -120,7 +124,7 @@ describe('Router', () => {
 
             router.get('/subroute', new frontexpress.Middleware());
 
-            const r = router.routes('/route1/subroute', 'GET');
+            const r = router.routes(application, {uri: '/route1/subroute', method: 'GET'});
             assert(r.length === 1);
             assert(r[0].uri === '/route1/subroute');
         });
@@ -130,7 +134,7 @@ describe('Router', () => {
 
             router.get(new frontexpress.Middleware());
 
-            const r = router.routes('/route1', 'GET');
+            const r = router.routes(application, {uri: '/route1', method: 'GET'});
             assert(r.length === 1);
             assert(r[0].uri === '/route1');
         });
@@ -140,7 +144,7 @@ describe('Router', () => {
 
             router.get('/subroute', new frontexpress.Middleware());
 
-            const r = router.routes('/route1/subroute', 'GET');
+            const r = router.routes(application, {uri: '/route1/subroute', method: 'GET'});
             assert(r.length === 1);
             assert(r[0].uri === '/route1/subroute');
         });
@@ -150,7 +154,7 @@ describe('Router', () => {
 
             router.get('/subroute  ', new frontexpress.Middleware());
 
-            let r = router.routes('/route1/subroute', 'GET');
+            let r = router.routes(application, {uri: '/route1/subroute', method: 'GET'});
             assert(r.length === 1);
             assert(r[0].uri === '/route1/subroute');
 
@@ -160,7 +164,7 @@ describe('Router', () => {
 
             router.get(new frontexpress.Middleware());
 
-            r = router.routes('/route1', 'GET');
+            r = router.routes(application, {uri: '/route1', method: 'GET'});
             assert(r.length === 1);
             assert(r[0].uri === '/route1');
         });
@@ -170,7 +174,7 @@ describe('Router', () => {
 
             router.get('/subroute', new frontexpress.Middleware());
 
-            let r = router.routes('/route1/subroute?a=b&c=d', 'GET');
+            let r = router.routes(application, {uri: '/route1/subroute?a=b&c=d', method: 'GET'});
             assert(r.length === 1);
             assert(r[0].uri === '/route1/subroute');
             assert(r[0].data === undefined);
@@ -181,7 +185,7 @@ describe('Router', () => {
 
             router.get('/subroute', new frontexpress.Middleware());
 
-            let r = router.routes('/route1/subroute#a=b&c=d', 'GET');
+            let r = router.routes(application, {uri: '/route1/subroute#a=b&c=d', method: 'GET'});
             assert(r.length === 1);
             assert(r[0].uri === '/route1/subroute');
             assert(r[0].data === undefined);
@@ -192,7 +196,7 @@ describe('Router', () => {
 
             router.get('/subroute', new frontexpress.Middleware());
 
-            let r = router.routes('/route1/subroute?a=b&c=d#anchor1', 'GET');
+            let r = router.routes(application, {uri: '/route1/subroute?a=b&c=d#anchor1', method: 'GET'});
             assert(r.length === 1);
             assert(r[0].uri === '/route1/subroute');
             assert(r[0].data === undefined);
@@ -264,7 +268,7 @@ describe('Router', () => {
 
             router.get(middleware);
 
-            const r = router.routes('/', 'GET');
+            const r = router.routes(application, {uri: '/', method: 'GET'});
             assert(r.length === 1);
             assert(r[0].uri === '/');
             assert(r[0].method === 'GET');
@@ -277,7 +281,7 @@ describe('Router', () => {
 
             router.get('/route1', middleware);
 
-            const r = router.routes('/route1', 'GET');
+            const r = router.routes(application, {uri: '/route1', method: 'GET'});
             assert(r.length === 1);
             assert(r[0].uri === '/route1');
             assert(r[0].method === 'GET');
@@ -295,12 +299,121 @@ describe('Router', () => {
             const middleware = new frontexpress.Middleware();
             router.get(middleware);
 
-            const r = router.routes('/part1', 'GET');
+            const r = router.routes(application, {uri: '/part1', method: 'GET'});
             assert(r.length === 1);
             assert(r[0].uri instanceof RegExp);
             assert(r[0].uri.toString() === new RegExp('^\/part').toString());
             assert(r[0].method === 'GET');
             assert(r[0].middleware === middleware);
+        });
+    });
+
+    describe('check route matcher', () => {
+        it('/', () => {
+            const route = {uri: '/', method: 'GET'};
+
+            const request = {uri: '/', method: 'GET', params: {}};
+            assert(routeMatcher(request, route));
+            assert.deepEqual(request.params, {});
+        });
+
+        it('/a/b/c', () => {
+            const route = {uri: '/a/b/c', method: 'GET'};
+
+            let request = {uri: '/a/b/c', method: 'GET', params: {}};
+            assert(routeMatcher(request, route));
+            assert.deepEqual(request.params, {});
+
+            request = {uri: '/a/b/c/', method: 'GET', params: {}};
+            assert.strictEqual(routeMatcher(request, route), false);
+        });
+
+        it('/^\//', () => {
+            const route = {uri: /^\//, method: 'GET'};
+
+            const request = {uri: '/a/b/c', method: 'GET', params: {}};
+            assert(routeMatcher(request, route));
+            assert.deepEqual(request.params, {});
+        });
+
+        it('/:id', () => {
+            const route = {uri: '/:id', method: 'GET'};
+
+            const request = {uri: '/1000', method: 'GET', params: {}};
+            assert(routeMatcher(request, route));
+            assert.strictEqual(request.params.id, 1000);
+        });
+
+        it('/user/:id', () => {
+            const route = {uri: '/user/:id', method: 'GET'};
+
+            let request = {uri: '/user/1000', method: 'GET', params: {}};
+            assert(routeMatcher(request, route));
+            assert.strictEqual(request.params.id, 1000);
+
+            request = {uri: '/user/100.2122', method: 'GET', params: {}};
+            assert(routeMatcher(request, route));
+            assert.strictEqual(request.params.id, 100.2122);
+
+            request = {uri: '/user', method: 'GET', params: {}};
+            assert.strictEqual(routeMatcher(request, route), false);
+
+            request = {uri: '/user/', method: 'GET', params: {}};
+            assert.strictEqual(routeMatcher(request, route), false);
+        });
+
+        it('/user/:id with id as coma separated values', () => {
+            const route = {uri: '/user/:id', method: 'GET'};
+
+            let request = {uri: '/user/1,2,3', method: 'GET', params: {}};
+            assert(routeMatcher(request, route));
+            assert.deepEqual(request.params, {id: [1,2,3]});
+
+            request = {uri: '/user/1.5,2.55,4.25', method: 'GET', params: {}};
+            assert(routeMatcher(request, route));
+            assert.deepEqual(request.params, {id: [1.5,2.55,4.25]});
+
+            request = {uri: '/user/a,b,c', method: 'GET', params: {}};
+            assert(routeMatcher(request, route));
+            assert.deepEqual(request.params, {id: ['a','b','c']});
+        });
+
+        it('/user/:id?', () => {
+            const route = {uri: '/user/:id?', method: 'GET'};
+
+            let request = {uri: '/user/1000', method: 'GET', params: {}};
+            assert(routeMatcher(request, route));
+            assert.strictEqual(request.params.id, 1000);
+
+            request = {uri: '/user', method: 'GET', params: {}};
+            assert.strictEqual(routeMatcher(request, route), true);
+            assert.deepEqual(request.params, {id: undefined});
+
+            request = {uri: '/user/', method: 'GET', params: {}};
+            assert.strictEqual(routeMatcher(request, route), false);
+        });
+
+        it('/user/:firstname/:lastname', () => {
+            const route = {uri: '/user/:firstname/:lastname', method: 'GET'};
+
+            let request = {uri: '/user/camel/aissani', method: 'GET', params: {}};
+            assert(routeMatcher(request, route));
+            assert.deepEqual(request.params, {firstname: 'camel', lastname:'aissani'} );
+
+            request = {uri: '/user/camel', method: 'GET', params: {}};
+            assert.strictEqual(routeMatcher(request, route), false);
+        });
+
+        it('/user/:firstname?/:lastname', () => {
+            const route = {uri: '/user/:firstname?/:lastname', method: 'GET'};
+
+            let request = {uri: '/user/camel/aissani', method: 'GET', params: {}};
+            assert(routeMatcher(request, route));
+            assert.deepEqual(request.params, {firstname: 'camel', lastname:'aissani'} );
+
+            request = {uri: '/user/aissani', method: 'GET', params: {}};
+            assert(routeMatcher(request, route));
+            assert.deepEqual(request.params, {firstname: undefined, lastname:'aissani'} );
         });
     });
 });

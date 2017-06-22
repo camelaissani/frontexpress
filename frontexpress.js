@@ -137,200 +137,6 @@ var toConsumableArray = function (arr) {
 };
 
 /**
- * Module dependencies.
- * @private
- */
-
-var Requester = function () {
-    function Requester() {
-        classCallCheck(this, Requester);
-    }
-
-    createClass(Requester, [{
-        key: 'fetch',
-
-
-        /**
-         * Make an ajax request.
-         *
-         * @param {Object} request
-         * @param {Function} success callback
-         * @param {Function} failure callback
-         * @private
-         */
-
-        value: function fetch(request, resolve, reject) {
-            var method = request.method,
-                uri = request.uri,
-                headers = request.headers,
-                data = request.data;
-
-
-            var success = function success(responseText) {
-                resolve(request, {
-                    status: 200,
-                    statusText: 'OK',
-                    responseText: responseText
-                });
-            };
-
-            var fail = function fail(_ref) {
-                var status = _ref.status,
-                    statusText = _ref.statusText,
-                    errorThrown = _ref.errorThrown;
-
-                reject(request, {
-                    status: status,
-                    statusText: statusText,
-                    errorThrown: errorThrown,
-                    errors: 'HTTP ' + status + ' ' + (statusText ? statusText : '')
-                });
-            };
-
-            var xmlhttp = new XMLHttpRequest();
-            xmlhttp.onreadystatechange = function () {
-                if (xmlhttp.readyState === 4) {
-                    //XMLHttpRequest.DONE
-                    if (xmlhttp.status === 200) {
-                        success(xmlhttp.responseText);
-                    } else {
-                        fail({ status: xmlhttp.status, statusText: xmlhttp.statusText });
-                    }
-                }
-            };
-            try {
-                xmlhttp.open(method, uri, true);
-                if (headers) {
-                    Object.keys(headers).forEach(function (header) {
-                        xmlhttp.setRequestHeader(header, headers[header]);
-                    });
-                }
-                if (data) {
-                    xmlhttp.send(data);
-                } else {
-                    xmlhttp.send();
-                }
-            } catch (errorThrown) {
-                fail({ errorThrown: errorThrown });
-            }
-        }
-    }]);
-    return Requester;
-}();
-
-/**
- * Module dependencies.
- * @private
- */
-
-/**
- * Settings object.
- * @private
- */
-
-var Settings = function () {
-
-    /**
-     * Initialize the settings.
-     *
-     *   - setup default configuration
-     *
-     * @private
-     */
-
-    function Settings() {
-        classCallCheck(this, Settings);
-
-        // default settings
-        this.settings = {
-            'http requester': new Requester(),
-
-            'http GET transformer': {
-                uri: function uri(_ref) {
-                    var _uri = _ref.uri,
-                        headers = _ref.headers,
-                        data = _ref.data;
-
-                    if (!data) {
-                        return _uri;
-                    }
-                    var uriWithoutAnchor = _uri,
-                        anchor = '';
-
-                    var match = /^(.*)(#.*)$/.exec(_uri);
-                    if (match) {
-                        var _$exec = /^(.*)(#.*)$/.exec(_uri);
-
-                        var _$exec2 = slicedToArray(_$exec, 3);
-
-                        uriWithoutAnchor = _$exec2[1];
-                        anchor = _$exec2[2];
-                    }
-                    uriWithoutAnchor = Object.keys(data).reduce(function (gUri, d, index) {
-                        gUri += '' + (index === 0 && gUri.indexOf('?') === -1 ? '?' : '&') + d + '=' + data[d];
-                        return gUri;
-                    }, uriWithoutAnchor);
-                    return uriWithoutAnchor + anchor;
-                }
-            }
-            // 'http POST transformer': {
-            //     headers({uri, headers, data}) {
-            //         if (!data) {
-            //             return headers;
-            //         }
-            //         const updatedHeaders = headers || {};
-            //         if (!updatedHeaders['Content-Type']) {
-            //             updatedHeaders['Content-Type'] = 'application/x-www-form-urlencoded';
-            //         }
-            //         return updatedHeaders;
-            //     }
-            // }
-        };
-
-        this.rules = {
-            'http requester': function httpRequester(requester) {
-                if (typeof requester.fetch !== 'function') {
-                    throw new TypeError('setting http requester has no fetch method');
-                }
-            }
-        };
-    }
-
-    /**
-     * Assign `setting` to `val`
-     *
-     * @param {String} setting
-     * @param {*} [val]
-     * @private
-     */
-
-    createClass(Settings, [{
-        key: 'set',
-        value: function set$$1(name, value) {
-            var checkRules = this.rules[name];
-            if (checkRules) {
-                checkRules(value);
-            }
-            this.settings[name] = value;
-        }
-
-        /**
-         * Return `setting`'s value.
-         *
-         * @param {String} setting
-         * @private
-         */
-
-    }, {
-        key: 'get',
-        value: function get$$1(name) {
-            return this.settings[name];
-        }
-    }]);
-    return Settings;
-}();
-
-/**
  * Middleware object.
  * @public
  */
@@ -543,26 +349,11 @@ var Router = function () {
 
     }, {
         key: 'routes',
-        value: function routes(uri, method) {
+        value: function routes(application, request) {
+            request.params = request.params || {};
+            var isRouteMatch = application.get('route matcher');
             return this._routes.filter(function (route) {
-                if (route.method && route.method !== method) {
-                    return false;
-                }
-
-                if (!route.uri || !uri) {
-                    return true;
-                }
-
-                //remove query string from uri to test
-                //remove anchor from uri to test
-                var match = /^(.*)\?.*#.*|(.*)(?=\?|#)|(.*[^\?#])$/.exec(uri);
-                var baseUriToCheck = match[1] || match[2] || match[3];
-
-                if (route.uri instanceof RegExp) {
-                    return baseUriToCheck.match(route.uri);
-                }
-
-                return route.uri === baseUriToCheck;
+                return isRouteMatch(request, route);
             });
         }
 
@@ -724,6 +515,284 @@ HTTP_METHODS.forEach(function (method) {
     };
 });
 
+function routeMatcher(request, route) {
+    // check if http method are equals
+    if (route.method && route.method !== request.method) {
+        return false;
+    }
+
+    // route and uri not defined always match
+    if (!route.uri || !request.uri) {
+        return true;
+    }
+
+    //remove query string and anchor from uri to test
+    var match = /^(.*)\?.*#.*|(.*)(?=\?|#)|(.*[^\?#])$/.exec(request.uri);
+    var baseUriToCheck = match[1] || match[2] || match[3];
+
+    // if route is a regexp path
+    if (route.uri instanceof RegExp) {
+        return baseUriToCheck.match(route.uri) !== null;
+    }
+
+    // if route is parameterized path
+    if (route.uri.indexOf(':') !== -1) {
+
+        var decodeParmeterValue = function decodeParmeterValue(v) {
+            return !isNaN(parseFloat(v)) && isFinite(v) ? Number.isInteger(v) ? Number.parseInt(v, 10) : Number.parseFloat(v) : v;
+        };
+
+        // figure out key names
+        var keys = [];
+        var keysRE = /:([^\/\?]+)\??/g;
+        var keysMatch = keysRE.exec(route.uri);
+        while (keysMatch != null) {
+            keys.push(keysMatch[1]);
+            keysMatch = keysRE.exec(route.uri);
+        }
+
+        // change parameterized path to regexp
+        var regExpUri = route.uri
+        //                             :parameter?
+        .replace(/\/:[^\/]+\?/g, '(?:\/([^\/]+))?')
+        //                             :parameter
+        .replace(/:[^\/]+/g, '([^\/]+)')
+        //                             escape all /
+        .replace('/', '\\/');
+
+        // checks if uri match
+        var routeMatch = baseUriToCheck.match(new RegExp('^' + regExpUri + '$'));
+        if (!routeMatch) {
+            return false;
+        }
+
+        // update params in request with keys
+        request.params = Object.assign(request.params, keys.reduce(function (acc, key, index) {
+            var value = routeMatch[index + 1];
+            if (value) {
+                value = value.indexOf(',') !== -1 ? value.split(',').map(function (v) {
+                    return decodeParmeterValue(v);
+                }) : value = decodeParmeterValue(value);
+            }
+            acc[key] = value;
+            return acc;
+        }, {}));
+        return true;
+    }
+
+    // if route is a simple path
+    return route.uri === baseUriToCheck;
+}
+
+/**
+ * Module dependencies.
+ * @private
+ */
+
+var Requester = function () {
+    function Requester() {
+        classCallCheck(this, Requester);
+    }
+
+    createClass(Requester, [{
+        key: 'fetch',
+
+
+        /**
+         * Make an ajax request.
+         *
+         * @param {Object} request
+         * @param {Function} success callback
+         * @param {Function} failure callback
+         * @private
+         */
+
+        value: function fetch(request, resolve, reject) {
+            var method = request.method,
+                uri = request.uri,
+                headers = request.headers,
+                data = request.data;
+
+
+            var success = function success(responseText) {
+                resolve(request, {
+                    status: 200,
+                    statusText: 'OK',
+                    responseText: responseText
+                });
+            };
+
+            var fail = function fail(_ref) {
+                var status = _ref.status,
+                    statusText = _ref.statusText,
+                    errorThrown = _ref.errorThrown;
+
+                reject(request, {
+                    status: status,
+                    statusText: statusText,
+                    errorThrown: errorThrown,
+                    errors: 'HTTP ' + status + ' ' + (statusText ? statusText : '')
+                });
+            };
+
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState === 4) {
+                    //XMLHttpRequest.DONE
+                    if (xmlhttp.status === 200) {
+                        success(xmlhttp.responseText);
+                    } else {
+                        fail({ status: xmlhttp.status, statusText: xmlhttp.statusText });
+                    }
+                }
+            };
+            try {
+                xmlhttp.open(method, uri, true);
+                if (headers) {
+                    Object.keys(headers).forEach(function (header) {
+                        xmlhttp.setRequestHeader(header, headers[header]);
+                    });
+                }
+                if (data) {
+                    xmlhttp.send(data);
+                } else {
+                    xmlhttp.send();
+                }
+            } catch (errorThrown) {
+                fail({ errorThrown: errorThrown });
+            }
+        }
+    }]);
+    return Requester;
+}();
+
+var httpGetTransformer = {
+    uri: function uri(_ref2) {
+        var _uri = _ref2.uri,
+            headers = _ref2.headers,
+            data = _ref2.data;
+
+        if (!data) {
+            return _uri;
+        }
+        var uriWithoutAnchor = _uri,
+            anchor = '';
+
+        var match = /^(.*)(#.*)$/.exec(_uri);
+        if (match) {
+            var _$exec = /^(.*)(#.*)$/.exec(_uri);
+
+            var _$exec2 = slicedToArray(_$exec, 3);
+
+            uriWithoutAnchor = _$exec2[1];
+            anchor = _$exec2[2];
+        }
+        uriWithoutAnchor = Object.keys(data).reduce(function (gUri, d, index) {
+            gUri += '' + (index === 0 && gUri.indexOf('?') === -1 ? '?' : '&') + d + '=' + data[d];
+            return gUri;
+        }, uriWithoutAnchor);
+        return uriWithoutAnchor + anchor;
+    }
+};
+
+// export const httpPostTransformer = {
+//     headers({uri, headers, data}) {
+//         if (!data) {
+//             return headers;
+//         }
+//         const updatedHeaders = headers || {};
+//         if (!updatedHeaders['Content-Type']) {
+//             updatedHeaders['Content-Type'] = 'application/x-www-form-urlencoded';
+//         }
+//         return updatedHeaders;
+//     }
+// };
+
+/**
+ * Module dependencies.
+ * @private
+ */
+function errorIfNotFunction(toTest, message) {
+    if (typeof toTest !== 'function') {
+        throw new TypeError(message);
+    }
+}
+
+/**
+ * Settings object.
+ * @private
+ */
+
+var Settings = function () {
+
+    /**
+     * Initialize the settings.
+     *
+     *   - setup default configuration
+     *
+     * @private
+     */
+
+    function Settings() {
+        classCallCheck(this, Settings);
+
+        // default settings
+        this.settings = {
+            'http requester': new Requester(),
+            'http GET transformer': httpGetTransformer,
+            // 'http POST transformer': httpPostTransformer,
+            'route matcher': routeMatcher
+        };
+
+        this.rules = {
+            'http requester': function httpRequester(requester) {
+                errorIfNotFunction(requester.fetch, 'setting http requester has no fetch function');
+            },
+            'http GET transformer': function httpGETTransformer(transformer) {
+                if (!transformer || !transformer.uri && !transformer.headers && !transformer.data) {
+                    throw new TypeError('setting http transformer one of functions: uri, headers, data is missing');
+                }
+            },
+            'route matcher': function routeMatcher$$1(_routeMatcher) {
+                errorIfNotFunction(_routeMatcher, 'setting route matcher is not a function');
+            }
+        };
+    }
+
+    /**
+     * Assign `setting` to `val`
+     *
+     * @param {String} setting
+     * @param {*} [val]
+     * @private
+     */
+
+    createClass(Settings, [{
+        key: 'set',
+        value: function set$$1(name, value) {
+            var checkRules = this.rules[name];
+            if (checkRules) {
+                checkRules(value);
+            }
+            this.settings[name] = value;
+        }
+
+        /**
+         * Return `setting`'s value.
+         *
+         * @param {String} setting
+         * @private
+         */
+
+    }, {
+        key: 'get',
+        value: function get$$1(name) {
+            return this.settings[name];
+        }
+    }]);
+    return Settings;
+}();
+
 /**
  * Module dependencies.
  * @private
@@ -747,9 +816,8 @@ var Application = function () {
         classCallCheck(this, Application);
 
         this.routers = [];
-        // this.isDOMLoaded = false;
-        // this.isDOMReady = false;
         this.settings = new Settings();
+        this.plugins = [];
     }
 
     /**
@@ -768,6 +836,8 @@ var Application = function () {
     createClass(Application, [{
         key: 'set',
         value: function set$$1() {
+            var _settings;
+
             for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
                 args[_key] = arguments[_key];
             }
@@ -778,10 +848,7 @@ var Application = function () {
             }
 
             // set behaviour
-            var name = args[0],
-                value = args[1];
-
-            this.settings.set(name, value);
+            (_settings = this.settings).set.apply(_settings, args);
 
             return this;
         }
@@ -807,6 +874,12 @@ var Application = function () {
         value: function listen(callback) {
             var _this = this;
 
+            var request = { method: 'GET', uri: window.location.pathname + window.location.search };
+            var response = { status: 200, statusText: 'OK' };
+            var currentRoutes = this._routes(request);
+
+            this._callMiddlewareMethod('entered', currentRoutes, request);
+
             // manage history
             window.onpopstate = function (event) {
                 if (event.state) {
@@ -814,31 +887,26 @@ var Application = function () {
                         _request = _event$state.request,
                         _response = _event$state.response;
 
-                    var _currentRoutes = _this._routes(_request.uri, _request.method);
-
-                    _this._callMiddlewareMethod('exited');
-                    _this._callMiddlewareMethod('entered', _currentRoutes, _request);
-                    _this._callMiddlewareMethod('updated', _currentRoutes, _request, _response);
+                    ['exited', 'entered', 'updated'].forEach(function (middlewareMethod) {
+                        return _this._callMiddlewareMethod(middlewareMethod, _this._routes(_request), _request, _response);
+                    });
                 }
             };
 
             // manage page loading/refreshing
-            var request = { method: 'GET', uri: window.location.pathname + window.location.search };
-            var response = { status: 200, statusText: 'OK' };
-            var currentRoutes = this._routes();
+            window.onbeforeunload = function () {
+                _this._callMiddlewareMethod('exited');
+            };
 
             var whenPageIsInteractiveFn = function whenPageIsInteractiveFn() {
+                _this.plugins.forEach(function (pluginObject) {
+                    return pluginObject.plugin(_this);
+                });
                 _this._callMiddlewareMethod('updated', currentRoutes, request, response);
                 if (callback) {
                     callback(request, response);
                 }
             };
-
-            window.onbeforeunload = function () {
-                _this._callMiddlewareMethod('exited');
-            };
-
-            this._callMiddlewareMethod('entered', currentRoutes, request);
 
             document.onreadystatechange = function () {
                 // DOM ready state
@@ -876,6 +944,7 @@ var Application = function () {
         /**
          * Use the given middleware function or object, with optional _uri_.
          * Default _uri_ is "/".
+         * Or use the given plugin
          *
          *    // middleware function will be applied on path "/"
          *    app.use((req, res, next) => {console.log('Hello')});
@@ -883,8 +952,16 @@ var Application = function () {
          *    // middleware object will be applied on path "/"
          *    app.use(new Middleware());
          *
+         *    // use a plugin
+         *    app.use({
+         *      name: 'My plugin name',
+         *      plugin(application) {
+         *        // here plugin implementation
+         *      }
+         *    });
+         *
          * @param {String} uri
-         * @param {Middleware|Function} middleware object or function
+         * @param {Middleware|Function|plugin} middleware object, middleware function, plugin
          * @return {app} for chaining
          *
          * @public
@@ -900,19 +977,24 @@ var Application = function () {
             var _toParameters = toParameters(args),
                 baseUri = _toParameters.baseUri,
                 router = _toParameters.router,
-                middleware = _toParameters.middleware;
+                middleware = _toParameters.middleware,
+                plugin = _toParameters.plugin;
 
-            if (router) {
-                router.baseUri = baseUri;
-            } else if (middleware) {
-                router = new Router(baseUri);
-                HTTP_METHODS.forEach(function (method) {
-                    router[method.toLowerCase()](middleware);
-                });
+            if (plugin) {
+                this.plugins.push(plugin);
             } else {
-                throw new TypeError('method takes at least a middleware or a router');
+                if (router) {
+                    router.baseUri = baseUri;
+                } else if (middleware) {
+                    router = new Router(baseUri);
+                    HTTP_METHODS.forEach(function (method) {
+                        router[method.toLowerCase()](middleware);
+                    });
+                } else {
+                    throw new TypeError('method takes at least a middleware or a router');
+                }
+                this.routers.push(router);
             }
-            this.routers.push(router);
 
             return this;
         }
@@ -926,16 +1008,13 @@ var Application = function () {
 
     }, {
         key: '_routes',
-        value: function _routes() {
-            var uri = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : window.location.pathname + window.location.search;
-            var method = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'GET';
+        value: function _routes(request) {
+            var _this2 = this;
 
-            var currentRoutes = [];
-            this.routers.forEach(function (router) {
-                currentRoutes.push.apply(currentRoutes, toConsumableArray(router.routes(uri, method)));
-            });
-
-            return currentRoutes;
+            return this.routers.reduce(function (acc, router) {
+                acc.push.apply(acc, toConsumableArray(router.routes(_this2, request)));
+                return acc;
+            }, []);
         }
 
         /**
@@ -995,7 +1074,7 @@ var Application = function () {
     }, {
         key: '_fetch',
         value: function _fetch(req, resolve, reject) {
-            var _this2 = this;
+            var _this3 = this;
 
             var method = req.method,
                 uri = req.uri,
@@ -1019,7 +1098,7 @@ var Application = function () {
             this._callMiddlewareMethod('exited');
 
             // gathers all routes impacted by the uri
-            var currentRoutes = this._routes(uri, method);
+            var currentRoutes = this._routes(req);
 
             // calls middleware entered method
             this._callMiddlewareMethod('entered', currentRoutes, req);
@@ -1029,12 +1108,12 @@ var Application = function () {
                 if (history) {
                     window.history.pushState({ request: request, response: response }, history.title, history.uri);
                 }
-                _this2._callMiddlewareMethod('updated', currentRoutes, request, response);
+                _this3._callMiddlewareMethod('updated', currentRoutes, request, response);
                 if (resolve) {
                     resolve(request, response);
                 }
             }, function (request, response) {
-                _this2._callMiddlewareMethod('failed', currentRoutes, request, response);
+                _this3._callMiddlewareMethod('failed', currentRoutes, request, response);
                 if (reject) {
                     reject(request, response);
                 }
@@ -1136,29 +1215,25 @@ HTTP_METHODS.reduce(function (reqProto, method) {
 }, Application.prototype);
 
 function toParameters(args) {
+    var _args, _args2, _args3, _args4;
+
     var baseUri = void 0,
         middleware = void 0,
         router = void 0,
+        plugin = void 0,
         which = void 0;
-    if (args && args.length > 0) {
-        if (args.length === 1) {
-            var _args = slicedToArray(args, 1);
 
-            which = _args[0];
-        } else {
-            var _args2 = slicedToArray(args, 2);
+    args.length === 1 ? (_args = args, _args2 = slicedToArray(_args, 1), which = _args2[0], _args) : (_args3 = args, _args4 = slicedToArray(_args3, 2), baseUri = _args4[0], which = _args4[1], _args3);
 
-            baseUri = _args2[0];
-            which = _args2[1];
-        }
-
-        if (which instanceof Router) {
-            router = which;
-        } else if (which instanceof Middleware || typeof which === 'function') {
-            middleware = which;
-        }
+    if (which instanceof Router) {
+        router = which;
+    } else if (which instanceof Middleware || typeof which === 'function') {
+        middleware = which;
+    } else if (which && which.plugin && typeof which.plugin === 'function') {
+        plugin = which;
     }
-    return { baseUri: baseUri, middleware: middleware, router: router, which: which };
+
+    return { baseUri: baseUri, middleware: middleware, router: router, plugin: plugin, which: which };
 }
 
 /**

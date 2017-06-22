@@ -1,38 +1,14 @@
 ![frontexpress](http://fontmeme.com/embed.php?text=frontexpress&name=Atype%201%20Light.ttf&size=90&style_color=6F6F75)
 
+Code the front-end like on the back-end with [ExpressJS](http://expressjs.com/)
+
+[frontexpress demo](https://github.com/camelaissani/frontexpress-demo) repository.
+
  [![Build Status](https://travis-ci.org/camelaissani/frontexpress.svg?branch=master)](https://travis-ci.org/camelaissani/frontexpress)
  [![Code Climate](https://codeclimate.com/github/camelaissani/frontexpress/badges/gpa.svg)](https://codeclimate.com/github/camelaissani/frontexpress)
  [![Coverage Status](https://coveralls.io/repos/github/camelaissani/frontexpress/badge.svg?branch=master)](https://coveralls.io/github/camelaissani/frontexpress?branch=master)
  ![dependencies](https://img.shields.io/gemnasium/mathiasbynens/he.svg)
- ![Size Shield](https://img.shields.io/badge/size-2.86kb-brightgreen.svg)
-
-Frontexpress manages routes in browser like [ExpressJS](http://expressjs.com/) does on Node.
-
-Same language same API on all the stack.
-
-Code the front-end logic with the same style than on the back-end with express
-
-```js
-import frontexpress from 'frontexpress';
-
-// Front-end application
-const app = frontexpress();
-
-// front-end logic on navigation path "/page1"
-app.get('/page1', (req, res) => {
-    document.querySelector('.content').innerHTML = `<h1>Page 1 content</h1>`;
-});
-
-// front-end logic on navigation path "/page2"
-app.get('/page2', (req, res) => {
-    document.querySelector('.content').innerHTML = `<h1>Page 2 content</h1>`;
-});
-
-// start front-end application
-app.listen(() => {
-    // on DOM ready
-});
-```
+ ![Size Shield](https://img.shields.io/badge/size-3.26kb-brightgreen.svg)
 
 ## Installation
 
@@ -52,43 +28,31 @@ $ bower install frontexpress
 
 On [jsDelivr](https://cdn.jsdelivr.net/npm/frontexpress@1.1.0/frontexpress.min.js)
 
-## Quick Start
+## Usage
 
- The quickest way to get started with frontexpress is to clone the [frontexpress-demo](https://github.com/camelaissani/frontexpress-demo) repository.
+```js
+import frontexpress from 'frontexpress';
 
-## Tests
+// Front-end application
+const app = frontexpress();
 
- Clone the git repository:
+// front-end logic on navigation path "/page1"
+app.get('/page1', (req, res) => {
+    document.querySelector('.content').innerHTML = res.responseText;
+});
 
-```bash
-$ git clone git@github.com:camelaissani/frontexpress.git
-$ cd frontexpress
+// front-end logic on navigation path "/page2"
+app.get('/page2', (req, res) => {
+    document.querySelector('.content').innerHTML = res.responseText;
+});
+
+// start front-end application
+app.listen();
 ```
 
- Install the dependencies and run the test suite:
+### Routes
 
-```bash
-$ npm install
-$ npm test
-```
-
-
-## Navigation path and frontexpress routing
-
-### Disclaimer
-
->
-> In this first version of frontexpress, the API is not completely the mirror of the expressjs one.
->
-> There are some missing methods. Currently, the use, get, post... methods having a middleware array as parameter are not available.
-> The string pattern to define route paths is not yet implemented.
->
-> Obviously, the objective is to have the same API as expressjs when the methods make sense browser side.
->
-
-### Basic routing
-
-Listen navigation (GET request) on path /hello:
+Listen GET requests on path /hello:
 
 ```js
 app.get('/hello', (req, res) => {
@@ -96,7 +60,7 @@ app.get('/hello', (req, res) => {
 });
 ```
 
-Listen a POST request on path /item:
+Listen POST requests on path /item:
 
 ```js
 app.post('/item', (req, res) => {
@@ -104,14 +68,72 @@ app.post('/item', (req, res) => {
 });
 ```
 
-### Routing based on RegExp
-
-Listen navigation on paths which start with /api/:
+Listen GET requests on path starting with /api/:
 
 ```js
 app.get(/^api\//, (req, res) => {
   console.log(`api was requested ${req.uri}`);
 });
+```
+
+Get parameters from path
+
+```js
+app.get('/product/:id', (req, res) => {
+  // if we have /product/42 then
+  // req.params.id = 42
+});
+```
+
+```js
+app.get('/user/:firstname?/:lastname', (req, res) => {
+  // if we have /user/camel/aissani then
+  // req.params.firstname = 'camel'
+  // req.params.lastname = 'aissani'
+
+  // if we have /user/aissani then
+  // req.params.firstname = undefined
+  // req.params.lastname = 'aissani'
+});
+```
+
+```js
+app.get('/user/:id', (req, res) => {
+  // if we have /user/1,2,3 then
+  // req.params.id = [1,2,3]
+});
+```
+### Middleware object
+
+The middleware object gives access to more hooks
+
+```js
+  class MyMiddleware = new Middleware {
+    entered(req) {
+      // before request sent
+    }
+
+    updated(req, res) {
+      // after request sent
+      // res has the request response
+      window.alert('Hello World');
+    }
+
+    exited(req) {
+       // before a new request sent
+    }
+
+    failed(req, res) {
+       // on request failed
+    }
+
+    next() {
+       // for chaining
+       return true;
+    }
+
+  }
+  app.get('/hello', new MyMiddleware());
 ```
 
 ### Chain handlers
@@ -138,7 +160,7 @@ h2!
 
 h3 is ignored because ```next()``` function was not invoked.
 
-### app.route()
+#### app.route()
 
 You can create chainable route handlers for a route path by using ```app.route()```.
 
@@ -149,7 +171,7 @@ app.route('/book')
  .put((req, res) => { console.log('Update the book') });
 ```
 
-### frontexpress.Router
+#### frontexpress.Router
 
 Use the ```frontexpress.Router``` class to create modular, mountable route handlers.
 
@@ -187,121 +209,24 @@ import birds  from './birds';
 app.use('/birds', birds);
 ```
 
-## API
+## [API](https://github.com/camelaissani/frontexpress/blob/master/docs/api.md)
 
-|               | Method        | Short description |
-| :------------- | :--------------| :----------------- |
-|Frontexpress |||
-||[frontexpress()](https://github.com/camelaissani/frontexpress/blob/master/docs/frontexpress.md#frontexpress-1)|Creates an instance of application|
-||[frontexpress.Router()](https://github.com/camelaissani/frontexpress/blob/master/docs/frontexpress.md#frontexpressrouter)|Creates a Router object|
-||[frontexpress.Middleware](https://github.com/camelaissani/frontexpress/blob/master/docs/frontexpress.md#frontexpressmiddleware)|Returns the Middleware class |
-||||
-|Application |||
-||[set(setting, value)](https://github.com/camelaissani/frontexpress/blob/master/docs/application.md#applicationsetsetting-val)|Assigns a setting|
-||[listen(callback)](https://github.com/camelaissani/frontexpress/blob/master/docs/application.md#applicationlistencallback)|Starts the application|
-||[route(uri)](https://github.com/camelaissani/frontexpress/blob/master/docs/application.md#applicationrouteuri)|Gets a Router initialized with a root path|
-||[use(uri, middleware)](https://github.com/camelaissani/frontexpress/blob/master/docs/application.md#applicationuseuri-middleware)|Sets a middleware|
-||||
-||[get(uri, middleware)](https://github.com/camelaissani/frontexpress/blob/master/docs/application.md#applicationgeturi-middleware-applicationposturi-middleware)|Applies a middleware on given path for a GET request|
-||[post(uri, middleware)](https://github.com/camelaissani/frontexpress/blob/master/docs/application.md#applicationgeturi-middleware-applicationposturi-middleware)|Applies a middleware on given path for a POST request|
-||[put(uri, middleware)](https://github.com/camelaissani/frontexpress/blob/master/docs/application.md#applicationgeturi-middleware-applicationposturi-middleware)|Applies a middleware on given path for a PUT request|
-||[delete(uri, middleware)](https://github.com/camelaissani/frontexpress/blob/master/docs/application.md#applicationgeturi-middleware-applicationposturi-middleware)|Applies a middleware on given path for a DELETE request|
-||||
-||[httpGet(request, success, failure)](https://github.com/camelaissani/frontexpress/blob/master/docs/application.md#applicationhttpgetrequest-success-failure-applicationhttppostrequest-success-failure)|Invokes a GET ajax request|
-||[httpPost(request, success, failure)](https://github.com/camelaissani/frontexpress/blob/master/docs/application.md#applicationhttpgetrequest-success-failure-applicationhttppostrequest-success-failure)|Invokes a POST ajax request|
-||[httpPut(request, success, failure)](https://github.com/camelaissani/frontexpress/blob/master/docs/application.md#applicationhttpgetrequest-success-failure-applicationhttppostrequest-success-failure)|Invokes a PUT ajax request|
-||[httpDelete(request, success, failure)](https://github.com/camelaissani/frontexpress/blob/master/docs/application.md#applicationhttpgetrequest-success-failure-applicationhttppostrequest-success-failure)|Invokes a DELETE ajax request|
-||||
-|Router |||
-||[use(middleware)](https://github.com/camelaissani/frontexpress/blob/master/docs/router.md#routerusemiddleware)|Sets a middleware|
-||[all(middleware)](https://github.com/camelaissani/frontexpress/blob/master/docs/router.md#routerallmiddleware)|Sets a middleware on all HTTP method requests|
-||||
-||[get(uri, middleware)](https://github.com/camelaissani/frontexpress/blob/master/docs/router.md#routergeturi-middleware-routerposturi-middleware)|Applies a middleware on given path for a GET request|
-||[post(uri, middleware)](https://github.com/camelaissani/frontexpress/blob/master/docs/router.md#routergeturi-middleware-routerposturi-middleware)|Applies a middleware on given path for a POST request|
-||[put(uri, middleware)](https://github.com/camelaissani/frontexpress/blob/master/docs/router.md#routergeturi-middleware-routerposturi-middleware)|Applies a middleware on given path for a PUT request|
-||[delete(uri, middleware)](https://github.com/camelaissani/frontexpress/blob/master/docs/router.md#routergeturi-middleware-routerposturi-middleware)|Applies a middleware on given path for a DELETE request|
-||||
-|Middleware |||
-||[entered(request)](https://github.com/camelaissani/frontexpress/blob/master/docs/middleware.md#middlewareenteredrequest)|Invoked by the app before an ajax request is sent|
-||[exited(request)](https://github.com/camelaissani/frontexpress/blob/master/docs/middleware.md#middlewareexitedrequest)|Invoked by the app before a new ajax request is sent|
-||[updated(request, response)](https://github.com/camelaissani/frontexpress/blob/master/docs/middleware.md#middlewareupdatedrequest-response)|Invoked by the app after an ajax request has responded|
-||[failed(request, response)](https://github.com/camelaissani/frontexpress/blob/master/docs/middleware.md#middlewarefailedrequest-response)|Invoked by the app after an ajax request has failed|
-||[next()](https://github.com/camelaissani/frontexpress/blob/master/docs/middleware.md#middlewarenext)|Allows to break the middleware chain execution|
+## Tests
 
+ Clone the git repository:
 
-### middleware function
-
-After registering a middleware function, the application invokes it with these parameters:
-
-```js
-  (request, response, next) => {
-    next();
-  }
+```bash
+$ git clone git@github.com:camelaissani/frontexpress.git
+$ cd frontexpress
 ```
 
-**request**: `Object`, the ajax request information sent by the app
+ Install the dependencies and run the test suite:
 
-**response**: `Object`, the response of request
-
-**next**: `Function`, the `next()` function to call to not break the middleware execution chain
-
-
-### request object
-
-```js
-  {
-    method,
-    uri,
-    headers,
-    data,
-    history: {
-      state,
-      title,
-      uri
-    }
-  }
+```bash
+$ npm install
+$ npm test
 ```
-
-**method**: `String`, HTTP methods 'GET', 'POST'...
-
-**uri**: `String`, path
-
-**headers**: `Object`, custom HTTP headers
-
-**data**: `Object`, data attached to the request
-
-**history**: `Object`, object with properties state, title and uri
-
-**If the history object is set, it will activate the browser history management.** See [browser pushState() method](https://developer.mozilla.org/en-US/docs/Web/API/History_API#The_pushState()_method) for more information about state, title, and uri (url).
-
-> uri and history.uri can be different.
-
-
-### response object
-
-```js
-  {
-    status,
-    statusText,
-    responseText,
-    errorThrown,
-    errors
-  }
-```
-
-**status**: `Number`, HTTP status 200, 404, 401, 500...
-
-**statusText**: `String`
-
-**responseText**: `String` response content
-
-**errorThrown**: `Object` exception thrown (if request fails)
-
-**errors**: `String` error description (if request fails)
-
 
 ## License
 
  [MIT](LICENSE)
-
-

@@ -989,4 +989,22 @@ describe('Application', () => {
             });
         });
     });
+
+    describe('plugin management', () => {
+        it('setup a plugin', (done) => {
+            const app = frontexpress();
+            app.use({
+                name: 'my plugin',
+                plugin(application) {
+                    done();
+                }
+            });
+
+            app.listen();
+
+            //simulate readystatechange
+            document.readyState = 'interactive';
+            document.onreadystatechange();
+        });
+    });
 });
