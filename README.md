@@ -2,7 +2,7 @@
 
 Code the front-end like on the back-end with [ExpressJS](http://expressjs.com/)
 
-[frontexpress demo](https://github.com/camelaissani/frontexpress-demo) repository.
+[frontexpress demo](https://github.com/camelaissani/frontexpress-demo)
 
  [![Build Status](https://travis-ci.org/camelaissani/frontexpress.svg?branch=master)](https://travis-ci.org/camelaissani/frontexpress)
  [![Code Climate](https://codeclimate.com/github/camelaissani/frontexpress/badges/gpa.svg)](https://codeclimate.com/github/camelaissani/frontexpress)
@@ -26,7 +26,7 @@ $ bower install frontexpress
 
 ### From CDN
 
-On [jsDelivr](https://cdn.jsdelivr.net/npm/frontexpress@1.1.0/frontexpress.min.js)
+On [jsDelivr](https://cdn.jsdelivr.net/npm/frontexpress@1.2.0/frontexpress.min.js)
 
 ## Usage
 
@@ -209,7 +209,9 @@ import birds  from './birds';
 app.use('/birds', birds);
 ```
 
-## [API](https://github.com/camelaissani/frontexpress/blob/master/docs/api.md)
+## More
+
+[API](https://github.com/camelaissani/frontexpress/blob/master/docs/api.md)
 
 ## Tests
 
@@ -229,4 +231,4 @@ $ npm test
 
 ## License
 
- [MIT](LICENSE)
+[MIT](LICENSE)
