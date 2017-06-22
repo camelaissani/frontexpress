@@ -21,6 +21,7 @@
   "ignore": [
     "**/.*",
     "index.js",
+    "gzipsize.js",
     "rollup.config.dev.js",
     "rollup.config.prod.js",
     "node_modules",
