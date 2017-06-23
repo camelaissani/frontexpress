@@ -1,6 +1,8 @@
 ![frontexpress](http://fontmeme.com/embed.php?text=frontexpress&name=Atype%201%20Light.ttf&size=90&style_color=6F6F75)
 
-Code the front-end like on the back-end with [ExpressJS](http://expressjs.com/)
+A simple vanilla JavaScript router a la [ExpressJS](http://expressjs.com/).
+
+Code the front-end like the back-end. 
 
 [frontexpress demo](https://github.com/camelaissani/frontexpress-demo)
 
