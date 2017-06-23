@@ -105,6 +105,8 @@ app.get('/user/:id', (req, res) => {
   // req.params.id = [1,2,3]
 });
 ```
+You can have the full capabilities of Express-style path with this plugin [frontexpress-path-to-regexp](https://github.com/camelaissani/frontexpress-path-to-regexp)
+
 ### Middleware object
 
 The middleware object gives access to more hooks
