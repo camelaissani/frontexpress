@@ -235,7 +235,7 @@ export default {
   plugin(app) {
     // the plugin implementation goes here
     
-    // Same ideas
+    // Some ideas
     // you can get settings
     // const transformer = app.get('http GET transformer');
     //
