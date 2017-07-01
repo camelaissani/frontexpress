@@ -2,7 +2,7 @@
 
 A simple vanilla JavaScript router a la [ExpressJS](http://expressjs.com/).
 
-Code the front-end like the back-end. 
+Code the front-end like the back-end.
 
 [frontexpress demo](https://github.com/camelaissani/frontexpress-demo)
 
@@ -10,7 +10,7 @@ Code the front-end like the back-end.
  [![Code Climate](https://codeclimate.com/github/camelaissani/frontexpress/badges/gpa.svg)](https://codeclimate.com/github/camelaissani/frontexpress)
  [![Coverage Status](https://coveralls.io/repos/github/camelaissani/frontexpress/badge.svg?branch=master)](https://coveralls.io/github/camelaissani/frontexpress?branch=master)
  ![dependencies](https://img.shields.io/gemnasium/mathiasbynens/he.svg)
- ![Size Shield](https://img.shields.io/badge/size-3.26kb-brightgreen.svg)
+ ![Size Shield](https://img.shields.io/badge/size-3.54kb-brightgreen.svg)
 
 ## Installation
 

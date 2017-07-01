@@ -687,26 +687,58 @@ var httpGetTransformer = {
             uriWithoutAnchor = _$exec2[1];
             anchor = _$exec2[2];
         }
-        uriWithoutAnchor = Object.keys(data).reduce(function (gUri, d, index) {
-            gUri += '' + (index === 0 && gUri.indexOf('?') === -1 ? '?' : '&') + d + '=' + data[d];
-            return gUri;
-        }, uriWithoutAnchor);
-        return uriWithoutAnchor + anchor;
+
+        return '' + uriWithoutAnchor + (uriWithoutAnchor.indexOf('?') === -1 ? '?' : '&') + encodeURIObject(data) + anchor;
     }
 };
 
-// export const httpPostTransformer = {
-//     headers({uri, headers, data}) {
-//         if (!data) {
-//             return headers;
-//         }
-//         const updatedHeaders = headers || {};
-//         if (!updatedHeaders['Content-Type']) {
-//             updatedHeaders['Content-Type'] = 'application/x-www-form-urlencoded';
-//         }
-//         return updatedHeaders;
-//     }
-// };
+var encodeURIObject = function encodeURIObject(obj) {
+    var branch = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+    var results = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
+
+    if (obj instanceof Object) {
+        Object.keys(obj).forEach(function (key) {
+            var newBranch = new (Function.prototype.bind.apply(Array, [null].concat(toConsumableArray(branch))))();
+            newBranch.push(key);
+            encodeURIObject(obj[key], newBranch, results);
+        });
+        return results.join('&');
+    }
+
+    if (branch.length > 0) {
+        results.push('' + encodeURIComponent(branch[0]) + branch.slice(1).map(function (el) {
+            return encodeURIComponent('[' + el + ']');
+        }).join('') + '=' + encodeURIComponent(obj));
+    } else if (typeof obj === 'string') {
+        return obj.split('').map(function (c, idx) {
+            return idx + '=' + encodeURIComponent(c);
+        }).join('&');
+    } else {
+        return '';
+    }
+};
+
+var httpPostPatchTransformer = {
+    data: function data(_ref3) {
+        var _data = _ref3.data;
+
+        if (!_data) {
+            return _data;
+        }
+        return encodeURIObject(_data);
+    },
+    headers: function headers(_ref4) {
+        var uri = _ref4.uri,
+            _headers = _ref4.headers,
+            data = _ref4.data;
+
+        var updatedHeaders = _headers || {};
+        if (!updatedHeaders['Content-Type']) {
+            updatedHeaders['Content-Type'] = 'application/x-www-form-urlencoded';
+        }
+        return updatedHeaders;
+    }
+};
 
 /**
  * Module dependencies.
@@ -715,6 +747,12 @@ var httpGetTransformer = {
 function errorIfNotFunction(toTest, message) {
     if (typeof toTest !== 'function') {
         throw new TypeError(message);
+    }
+}
+
+function errorIfNotHttpTransformer(toTest) {
+    if (!toTest || !toTest.uri && !toTest.headers && !toTest.data) {
+        throw new TypeError('setting http transformer one of functions: uri, headers, data is missing');
     }
 }
 
@@ -740,7 +778,8 @@ var Settings = function () {
         this.settings = {
             'http requester': new Requester(),
             'http GET transformer': httpGetTransformer,
-            // 'http POST transformer': httpPostTransformer,
+            'http POST transformer': httpPostPatchTransformer,
+            'http PATCH transformer': httpPostPatchTransformer,
             'route matcher': routeMatcher
         };
 
@@ -749,9 +788,13 @@ var Settings = function () {
                 errorIfNotFunction(requester.fetch, 'setting http requester has no fetch function');
             },
             'http GET transformer': function httpGETTransformer(transformer) {
-                if (!transformer || !transformer.uri && !transformer.headers && !transformer.data) {
-                    throw new TypeError('setting http transformer one of functions: uri, headers, data is missing');
-                }
+                errorIfNotHttpTransformer(transformer);
+            },
+            'http POST transformer': function httpPOSTTransformer(transformer) {
+                errorIfNotHttpTransformer(transformer);
+            },
+            'http PATCH transformer': function httpPATCHTransformer(transformer) {
+                errorIfNotHttpTransformer(transformer);
             },
             'route matcher': function routeMatcher$$1(_routeMatcher) {
                 errorIfNotFunction(_routeMatcher, 'setting route matcher is not a function');
