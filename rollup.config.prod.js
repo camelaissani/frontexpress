@@ -1,5 +1,7 @@
-import uglify from 'rollup-plugin-uglify-es';
+
 import babel from 'rollup-plugin-babel';
+import uglify from 'rollup-plugin-uglify';
+import { minify } from 'uglify-es';
 
 export default {
     entry: 'lib/frontexpress.js',
@@ -12,6 +14,6 @@ export default {
             babelrc: false,
             presets: ['es2015-rollup']
         }),
-        uglify()
+        uglify({}, minify)
     ]
 };
