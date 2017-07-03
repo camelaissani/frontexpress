@@ -112,7 +112,7 @@ You can have the full capabilities of Express-style path with this plugin [front
 The middleware object gives access to more hooks
 
 ```js
-  class MyMiddleware = new Middleware {
+  class MyMiddleware extends Middleware {
     entered(req) {
       // before request sent
     }
