@@ -7,3 +7,8 @@ engines:
 ratings:
   paths:
   - lib/**
+exclude_paths:
+- "dist/"
+- "test/"
+- "frontexpress.js"
+- "frontexpress.min.js"
