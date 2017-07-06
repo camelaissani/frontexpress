@@ -6,4 +6,4 @@ engines:
       - javascript
 ratings:
   paths:
-  - "lib/**/*"
+  - lib/**
