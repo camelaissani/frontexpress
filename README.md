@@ -10,7 +10,7 @@ Code the front-end like the back-end.
  [![Code Climate](https://codeclimate.com/github/camelaissani/frontexpress/badges/gpa.svg)](https://codeclimate.com/github/camelaissani/frontexpress)
  [![Coverage Status](https://coveralls.io/repos/github/camelaissani/frontexpress/badge.svg?branch=master)](https://coveralls.io/github/camelaissani/frontexpress?branch=master)
  ![dependencies](https://img.shields.io/gemnasium/mathiasbynens/he.svg)
- ![Size Shield](https://img.shields.io/badge/size-3.54kb-brightgreen.svg)
+ ![Size Shield](https://img.shields.io/badge/size-3.55kb-brightgreen.svg)
 
 ## Installation
 
@@ -234,7 +234,7 @@ export default {
   name: 'My plugin',
   plugin(app) {
     // the plugin implementation goes here
-    
+
     // Some ideas
     // you can get settings
     // const transformer = app.get('http GET transformer');

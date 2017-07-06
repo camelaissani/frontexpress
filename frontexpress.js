@@ -610,17 +610,10 @@ var Requester = function () {
         value: function fetch(request, resolve, reject) {
             var method = request.method,
                 uri = request.uri,
-                headers = request.headers,
+                _request$headers = request.headers,
+                headers = _request$headers === undefined ? [] : _request$headers,
                 data = request.data;
 
-
-            var success = function success(responseText) {
-                resolve(request, {
-                    status: 200,
-                    statusText: 'OK',
-                    responseText: responseText
-                });
-            };
 
             var fail = function fail(_ref) {
                 var status = _ref.status,
@@ -640,24 +633,25 @@ var Requester = function () {
                 if (xmlhttp.readyState === 4) {
                     //XMLHttpRequest.DONE
                     if (xmlhttp.status === 200) {
-                        success(xmlhttp.responseText);
+                        resolve(request, {
+                            status: 200,
+                            statusText: 'OK',
+                            responseText: xmlhttp.responseText
+                        });
                     } else {
-                        fail({ status: xmlhttp.status, statusText: xmlhttp.statusText });
+                        fail({
+                            status: xmlhttp.status,
+                            statusText: xmlhttp.statusText
+                        });
                     }
                 }
             };
             try {
                 xmlhttp.open(method, uri, true);
-                if (headers) {
-                    Object.keys(headers).forEach(function (header) {
-                        xmlhttp.setRequestHeader(header, headers[header]);
-                    });
-                }
-                if (data) {
-                    xmlhttp.send(data);
-                } else {
-                    xmlhttp.send();
-                }
+                Object.keys(headers).forEach(function (header) {
+                    return xmlhttp.setRequestHeader(header, headers[header]);
+                });
+                xmlhttp.send(data);
             } catch (errorThrown) {
                 fail({ errorThrown: errorThrown });
             }
@@ -841,6 +835,8 @@ var Settings = function () {
  * @private
  */
 
+var DEFAULT = { callback: function callback() {} };
+
 /**
  * Application class.
  */
@@ -914,8 +910,10 @@ var Application = function () {
 
     }, {
         key: 'listen',
-        value: function listen(callback) {
+        value: function listen() {
             var _this = this;
+
+            var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : DEFAULT.callback;
 
             var request = { method: 'GET', uri: window.location.pathname + window.location.search };
             var response = { status: 200, statusText: 'OK' };
@@ -946,9 +944,7 @@ var Application = function () {
                     return pluginObject.plugin(_this);
                 });
                 _this._callMiddlewareMethod('updated', currentRoutes, request, response);
-                if (callback) {
-                    callback(request, response);
-                }
+                callback(request, response);
             };
 
             document.onreadystatechange = function () {
@@ -1116,9 +1112,11 @@ var Application = function () {
 
     }, {
         key: '_fetch',
-        value: function _fetch(req, resolve, reject) {
+        value: function _fetch(req) {
             var _this3 = this;
 
+            var resolve = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : DEFAULT.callback;
+            var reject = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : DEFAULT.callback;
             var method = req.method,
                 uri = req.uri,
                 headers = req.headers,
@@ -1132,9 +1130,10 @@ var Application = function () {
                     _headersFn = httpMethodTransformer.headers,
                     _dataFn = httpMethodTransformer.data;
 
-                req.uri = _uriFn ? _uriFn({ uri: uri, headers: headers, data: data }) : uri;
-                req.headers = _headersFn ? _headersFn({ uri: uri, headers: headers, data: data }) : headers;
-                req.data = _dataFn ? _dataFn({ uri: uri, headers: headers, data: data }) : data;
+                Object.keys(httpMethodTransformer).forEach(function (k) {
+                    var fn = httpMethodTransformer[k];
+                    req[k] = fn ? fn({ uri: uri, headers: headers, data: data }) : req[k];
+                });
             }
 
             // calls middleware exited method
@@ -1152,14 +1151,10 @@ var Application = function () {
                     window.history.pushState({ request: request, response: response }, history.title, history.uri);
                 }
                 _this3._callMiddlewareMethod('updated', currentRoutes, request, response);
-                if (resolve) {
-                    resolve(request, response);
-                }
+                resolve(request, response);
             }, function (request, response) {
                 _this3._callMiddlewareMethod('failed', currentRoutes, request, response);
-                if (reject) {
-                    reject(request, response);
-                }
+                reject(request, response);
             });
         }
     }]);
@@ -1236,7 +1231,9 @@ HTTP_METHODS.reduce(function (reqProto, method) {
      * @public
      */
     var httpMethodName = 'http' + method.charAt(0).toUpperCase() + method.slice(1).toLowerCase();
-    reqProto[httpMethodName] = function (request, resolve, reject) {
+    reqProto[httpMethodName] = function (request) {
+        var resolve = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : DEFAULT.callback;
+        var reject = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : DEFAULT.callback;
         var uri = request.uri,
             headers = request.headers,
             data = request.data,
