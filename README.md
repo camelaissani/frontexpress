@@ -30,6 +30,10 @@ $ bower install frontexpress
 
 On [jsDelivr](https://cdn.jsdelivr.net/npm/frontexpress@1.2.0/frontexpress.min.js)
 
+## Documentation
+
+[Website and Documentation](http://www.frontexpressjs.com) 
+
 ## Usage
 
 ```js
