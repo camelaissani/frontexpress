@@ -1,7 +1,9 @@
 site_name: FrontExpress
 repo_url: https://github.com/camelaissani/frontexpress
+edit_uri: edit/master/docs/
 site_description: An Express.js-Style router for the front-end.
 site_author: Camel Aissani
+google_analytics: ['UA-50020382-4', 'auto']
 pages:
   - Home: index.md
   - Getting started:
