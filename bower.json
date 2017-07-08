@@ -20,6 +20,7 @@
   "homepage": "https://github.com/camelaissani/frontexpress",
   "ignore": [
     "**/.*",
+    "mkdocs.yml",
     "index.js",
     "gzipsize.js",
     "rollup.config.dev.js",
@@ -28,6 +29,7 @@
     "bower_components",
     "test",
     "tests",
-    "coverage"
+    "coverage",
+    "docs"
   ]
 }

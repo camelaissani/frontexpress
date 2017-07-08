@@ -1,7 +1,7 @@
 # Application
 
 
-## Application.set(setting, val)
+### set(setting, val)
 
 Assign `setting` to `val`, or return `setting`'s value.
 
@@ -20,7 +20,7 @@ Assign `setting` to `val`, or return `setting`'s value.
 **Returns**: `app`, for chaining
 
 
-## Application.listen(callback)
+### listen(callback)
 
 Listen to the DOM initialization and the browser history state changes.
 
@@ -39,7 +39,7 @@ the `document.readyState` equals to 'interactive'.
   **callback**: `function`, DOM is ready callback
 
 
-## Application.route(uri)
+### route(uri)
 
 Create a new `Router` instance for the _uri_.
 See the Router api docs for details.
@@ -56,7 +56,7 @@ See the Router api docs for details.
 **Returns**: `Router`, for chaining
 
 
-## Application.use(uri, middleware)
+### use(uri, middleware)
 
 Use the given middleware function or object, with optional _uri_.
 Default _uri_ is "/".
@@ -78,7 +78,7 @@ Default _uri_ is "/".
 **Returns**: `app`, for chaining
 
 
-## Application.get(uri, middleware), Application.post(uri, middleware)...
+### *method*(uri, middleware)
 
 Use the given middleware function or object, with optional _uri_ on
 HTTP methods: get, post, put, delete...
@@ -106,7 +106,7 @@ Default _uri_ is "/".
 **Returns**: `app`, for chaining
 
 
-## Application.httpGet(request, success, failure), Application.httpPost(request, success, failure)...
+### http*Method*(request, success, failure)
 
 Make an ajax request (get, post, put, delete...).
 

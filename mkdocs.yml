@@ -1,0 +1,23 @@
+site_name: FrontExpress
+repo_url: https://github.com/camelaissani/frontexpress
+site_description: An Express.js-Style router for the front-end.
+site_author: Camel Aissani
+pages:
+  - Home: index.md
+  - Getting started:
+    - Installing: installing.md
+    - Hello world: hello_world.md
+    - Routing: routing.md
+    - Middleware: middleware.md
+    - Chain middlewares: chain_middlewares.md
+  - API Reference:
+    - frontexpress: api/frontexpress.md
+    - application: api/application.md
+    - router: api/router.md
+    - middleware function: api/middleware_function.md
+    - middleware object: api/middleware_object.md
+    - request: api/request.md
+    - response: api/response.md
+  - Plugins: plugins.md
+theme: mkdocs
+theme_dir : custom_theme

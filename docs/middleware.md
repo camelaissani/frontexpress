@@ -1,63 +1,44 @@
 # Middleware
 
-## Middleware.entered(request)
+## middleware function
 
-Invoked by the app before ajax request are sent or
-during the DOM loading (document.readyState === 'loading').
-See Application#_callMiddlewareEntered documentation for details.
+After registering a middleware function, the application invokes it with these parameters:
 
-Override this method to add your custom behaviour
+```js
+  (request, response, next) => {
+    next();
+  }
+```
 
-**Parameters**
+## middleware object
 
-  **request**: `Object`
+The middleware object gives access to more hooks
 
+```js
+  class MyMiddleware extends Middleware {
+    entered(req) {
+      // before request sent
+    }
 
-## Middleware.exited(request)
+    updated(req, res) {
+      // after request sent
+      // res has the request response
+      window.alert('Hello World');
+    }
 
-Invoked by the app before a new ajax request is sent or before the DOM unloading.
-See Application#_callMiddlewareExited documentation for details.
+    exited(req) {
+       // before a new request sent
+    }
 
-Override this method to add your custom behaviour
+    failed(req, res) {
+       // on request failed
+    }
 
-**Parameters**
+    next() {
+       // for chaining
+       return true;
+    }
 
-  **request**: `Object`
-
-
-## Middleware.updated(request, response)
-
-Invoked on ajax request responding or on DOM ready
-(document.readyState === 'interactive').
-See Application#_callMiddlewareUpdated documentation for details.
-
-Override this method to add your custom behaviour
-
-**Parameters**
-
-  **request**: `Object`
-
-  **response**: `Object`
-
-
-## Middleware.failed(request, response)
-
-Invoked when ajax request fails.
-
-Override this method to add your custom behaviour
-
-**Parameters**
-
-  **request**: `Object`
-
-  **response**: `Object`
-
-
-## Middleware.next()
-
-Allow the hand over to the next middleware object or function.
-
-Override this method and return `false` to break execution of
-middleware chain.
-
-**Returns**: `Boolean`, `true` by default
+  }
+  app.get('/hello', new MyMiddleware());
+```

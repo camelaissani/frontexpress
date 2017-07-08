@@ -1,7 +1,7 @@
 # Router
 
 
-## Router.use(middleware)
+### use(middleware)
 
 Use the given middleware function or object on this router.
 
@@ -20,7 +20,7 @@ Use the given middleware function or object on this router.
   **Returns**: `Router`, for chaining
 
 
-## Router.all(middleware)
+### all(middleware)
 
 Use the given middleware function or object on this router for
 all HTTP methods.
@@ -40,7 +40,7 @@ all HTTP methods.
   **Returns**: `Router`, for chaining
 
 
-## Router.get(uri, middleware), Router.post(uri, middleware)...
+### *method*(uri, middleware)
 
 Use the given middleware function or object, with optional _uri_ on
 HTTP methods: get, post, put, delete...

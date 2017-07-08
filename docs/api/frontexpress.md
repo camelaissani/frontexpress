@@ -1,21 +1,21 @@
-# Frontexpress
+# FrontExpress
 
 
-## frontexpress() 
+### frontexpress()
 
 Create a frontexpress application.
 
 **Returns**: `Application`, the application
 
 
-## frontexpress.Router() 
+### frontexpress.Router()
 
 Expose the Router constructor
 
 **Returns**: `Router`
 
 
-## frontexpress.Middleware
+### frontexpress.Middleware
 
 Expose the Middleware class
 
