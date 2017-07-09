@@ -33,7 +33,7 @@ app.get('/', (req, res) => {
 });
 
 app.post('/login/:user', (req, res) => {
-    document.querySelector('.content').innerHTML = `Welcome ${user}!`;
+    document.querySelector('.content').innerHTML = `Welcome ${req.params.user}!`;
 });
 
 // start listening routes
