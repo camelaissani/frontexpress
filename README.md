@@ -11,6 +11,7 @@ Code the front-end like the back-end. Same language same framework.
  [![Coverage Status](https://coveralls.io/repos/github/camelaissani/frontexpress/badge.svg?branch=master)](https://coveralls.io/github/camelaissani/frontexpress?branch=master)
  ![dependencies](https://img.shields.io/gemnasium/mathiasbynens/he.svg)
  ![Size Shield](https://img.shields.io/badge/size-3.55kb-brightgreen.svg)
+ [![npm](https://img.shields.io/npm/dm/frontexpress.svg)](https://www.npmjs.com/package/frontexpress)
 
 ```js
 import frontexpress from 'frontexpress';
