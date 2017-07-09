@@ -19,9 +19,21 @@ import frontexpress from 'frontexpress';
 // Front-end application
 const app = frontexpress();
 
-// front-end logic on path "/"
+// handles http 401
+app.use((req, res, next)  => {
+    if (res.status === 401) {
+        window.alert('You are not authenticated! Please sign in.');
+    } else {
+        next();
+    }
+});
+
 app.get('/', (req, res) => {
     document.querySelector('.content').innerHTML = 'Hello World!';
+});
+
+app.post('/login/:user', (req, res) => {
+    document.querySelector('.content').innerHTML = `Welcome ${user}!`;
 });
 
 // start listening routes
