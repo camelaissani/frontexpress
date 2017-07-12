@@ -41,6 +41,9 @@ npm install frontexpress --save
 
 <center>
 Open source project made with <img class="emoji" alt=":coffee:" src="https://assets-cdn.github.com/images/icons/emoji/unicode/2615.png" width="20" height="20"> and <img class="emoji" alt=":heart:" src="https://assets-cdn.github.com/images/icons/emoji/unicode/2764.png" width="20" height="20">
+
+<br/>
+<iframe src="https://ghbtns.com/github-btn.html?user=camelaissani&repo=frontexpress&type=star&count=true&size=large" frameborder="0" scrolling="0" width="160px" height="30px"></iframe>
 </center>
 
 
