@@ -36,7 +36,7 @@ app.post('/login/:user', (req, res) => {
     document.querySelector('.content').innerHTML = `Welcome ${req.params.user}!`;
 });
 
-// start listening routes
+// start listening front-end requests (emitted/received)
 app.listen();
 ```
 ## Features
